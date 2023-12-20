@@ -3,10 +3,10 @@ package types
 import "fmt"
 
 type Employee struct {
-	UserID       int    `json:"user_id"`
+	UserID       int    `json:"userId"`
 	Age          int    `json:"age"`
 	Name         string `json:"name"`
-	DepartmentID int    `json:"department_id"`
+	DepartmentID int    `json:"departmentId"`
 }
 
 func (e Employee) String() string {
