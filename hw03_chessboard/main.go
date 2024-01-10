@@ -2,38 +2,32 @@ package main
 
 import (
 	"fmt"
+	"strings"
 )
 
-func makeLine(w int, uneven bool) (line string) {
-	for i := 0; i < w; i++ {
+func makeLine(w int, firstNum int) string {
+	var line strings.Builder
+	for i := firstNum; i < w; i++ {
 		switch {
-		case i%2 == 0 && uneven:
-			line += "#"
-		case uneven:
-			line += " "
-		case i%2 == 0 && !uneven:
-			line += " "
+		case i%2 == 0:
+			line.WriteString("#")
 		default:
-			line += "#"
+			line.WriteString(" ")
 		}
 	}
-	line += "\n"
-	return line
+	line.WriteString("\n")
+	return line.String()
 }
 
-func checkBoard(s int) (result string) {
+func checkBoard(s int) (result strings.Builder) {
 	h, w := s, s
-	var line string
-	var uneven bool
 	for i := 0; i < h; i++ {
 		switch {
 		case i%2 == 0:
-			uneven = false
+			result.WriteString(makeLine(w, 0))
 		default:
-			uneven = true
+			result.WriteString(makeLine(w+1, 1))
 		}
-		line = makeLine(w, uneven)
-		result += line
 	}
 	return result
 }
@@ -59,8 +53,8 @@ func main() {
 		fmt.Printf("Размер доски: %dx%d\n", size, size)
 	}
 
+	fmt.Println("------------------супердоска------------------")
 	result := checkBoard(size)
 
-	fmt.Println("------------------супердоска------------------")
-	fmt.Println(result)
+	fmt.Println(result.String())
 }
