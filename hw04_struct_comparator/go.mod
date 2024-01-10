@@ -1,3 +1,3 @@
-module github.com/fixme_my_friend/hw04_struct_comparator
+module github.com/chepsel/home_work_basic/hw04_struct_comparator
 
-go 1.20
+go 1.21

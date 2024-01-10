@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/chepsel/home_work_basic/hw04_struct_comparator/internal"
+	internal "github.com/chepsel/home_work_basic/hw04_struct_comparator/internal"
 )
 
 type checkFormat string
