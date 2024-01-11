@@ -1,7 +1,7 @@
 package internal
 
 type Book struct {
-	id     int
+	id     string
 	title  string
 	author string
 	year   uint16
@@ -9,23 +9,23 @@ type Book struct {
 	rate   float32
 }
 
-func NewBook() Book {
-	return Book{
-		id:     0,
-		title:  "Легенды и мифы южного бутово",
-		author: "Шекспир Игнат Кимерсенович",
-		year:   1907,
-		size:   8,
-		rate:   5,
+func NewBook(i string, t string, a string, y uint16, s uint16, r float32) *Book {
+	return &Book{
+		id:     i,
+		title:  t,
+		author: a,
+		year:   y,
+		size:   s,
+		rate:   r,
 	}
 }
 
-func (b *Book) ID() int {
+func (b *Book) ID() string {
 	return b.id
 }
 
-func (b *Book) SetID(pages int) {
-	b.id = pages
+func (b *Book) SetID(id string) {
+	b.id = id
 }
 
 func (b *Book) Title() string {
@@ -66,12 +66,4 @@ func (b *Book) Rate() float32 {
 
 func (b *Book) SetRate(rate float32) {
 	b.rate = rate
-}
-
-func IntSeq() func() int { // замыкание
-	i := 0
-	return func() int {
-		i++
-		return i
-	}
 }

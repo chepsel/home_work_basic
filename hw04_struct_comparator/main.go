@@ -3,75 +3,60 @@ package main
 import (
 	"fmt"
 
-	internal "github.com/chepsel/home_work_basic/hw04_struct_comparator/internal"
+	"github.com/chepsel/home_work_basic/hw04_struct_comparator/internal"
 )
 
-type checkFormat string
+type compareField int8
 
 const (
-	Left  checkFormat = "left"
-	Right checkFormat = "right"
+	Year compareField = iota
+	Size
+	Rate
 )
 
-type bookCompare struct {
-	compareFormat checkFormat
-	year          bool
-	size          bool
-	rate          bool
+type Comparator struct {
+	fieldCompare compareField
 }
 
-func intCompare(f checkFormat, l uint16, r uint16) bool {
-	switch {
-	case f == "left" && l > r:
-		return true
-	case f == "right" && r > l:
-		return true
-	default:
-		return false
+func (s compareField) String() string {
+	switch s {
+	case Year:
+		return "year"
+	case Size:
+		return "size"
+	case Rate:
+		return "rate"
 	}
+	return "unknown"
 }
 
-func floatCompare(f checkFormat, l float32, r float32) bool {
+func NewComparator(fieldComapre compareField) *Comparator {
+	return &Comparator{fieldCompare: fieldComapre}
+}
+
+func (c Comparator) Compare(bookLeft, bookRight *internal.Book) bool {
 	switch {
-	case f == "left" && l > r:
-		return true
-	case f == "right" && r > l:
-		return true
+	case c.fieldCompare == Year:
+		return bookLeft.Year() > bookRight.Year()
+	case c.fieldCompare == Size:
+		return bookLeft.Size() > bookRight.Size()
+	case c.fieldCompare == Rate:
+		return bookLeft.Rate() > bookRight.Rate()
 	default:
 		return false
 	}
 }
 
 func main() {
-	enum := Right
-	nextID := internal.IntSeq()
-	bookLeft := internal.NewBook()
-	bookRight := internal.NewBook()
+	year := NewComparator(Year)
+	size := NewComparator(Size)
+	rate := NewComparator(Rate)
+	bookLeft := internal.NewBook("978-5-389-21499-6", "Мюриель Барбери", "Элегантность ежика", 2009, 400, 2.4)
+	bookRight := internal.NewBook("172-8-335-00000-1", "Ибрагим Кимченымович", "Алкоголизм для чайников", 1969, 255, 3.9)
 
-	bookLeft.SetID(nextID())
-	bookLeft.SetAuthor("Мюриель Барбери")
-	bookLeft.SetTitle("Элегантность ежика")
-	bookLeft.SetYear(2009)
-	bookLeft.SetSize(400)
-	bookLeft.SetRate(2.4)
-
-	bookRight.SetID(nextID())
-	bookRight.SetAuthor("Анохин, Сахаров")
-	bookRight.SetTitle("Пособие тракториста")
-	bookRight.SetYear(1969)
-	bookRight.SetSize(255)
-	bookRight.SetRate(3.9)
-
-	compare := bookCompare{
-		compareFormat: enum,
-		year:          intCompare(enum, bookLeft.Year(), bookRight.Year()),
-		size:          intCompare(enum, bookLeft.Size(), bookRight.Size()),
-		rate:          floatCompare(enum, bookLeft.Rate(), bookRight.Rate()),
-	}
-	fmt.Println("compare type:", compare.compareFormat,
-		"\nyear:", compare.year,
-		"\nsize:", compare.size,
-		"\nrate:", compare.rate,
-		"\nbookLeft:", bookLeft,
-		"\nbookRight:", bookRight)
+	fmt.Println("Left book", bookLeft)
+	fmt.Println("Right book", bookRight)
+	fmt.Println("compare", year.fieldCompare.String(), "(left more then rigth):", year.Compare(bookLeft, bookRight))
+	fmt.Println("compare", size.fieldCompare.String(), "(left more then rigth):", size.Compare(bookLeft, bookRight))
+	fmt.Println("compare", rate.fieldCompare.String(), "(left more then rigth):", rate.Compare(bookLeft, bookRight))
 }
