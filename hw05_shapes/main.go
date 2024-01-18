@@ -17,7 +17,7 @@ type Kukareku interface {
 func calculateArea(s any) (float32, error) {
 	switch t := s.(type) {
 	case Shape:
-		return s.(Shape).GetArea()
+		return t.GetArea()
 	default:
 		return 0, fmt.Errorf("interface is not used, got: %T", &t)
 	}
