@@ -2,50 +2,16 @@ package main
 
 import (
 	"fmt"
-	"math"
+
+	"github.com/chepsel/home_work_basic/hw05_shapes/figure"
 )
 
 type Shape interface {
 	GetArea() (any, error)
 }
 
-type Triangle struct {
-	base   uint16
-	height uint16
-}
-
-type Rectangle struct {
-	width  uint16
-	height uint16
-}
-
-type Circle struct {
-	radius float64
-}
-
-type Squere struct {
-	side uint16
-}
-
-func (t *Triangle) GetArea() (any, error) {
-	if t.base > 0 && t.height > 0 {
-		return (t.base * t.height) / 2, nil
-	}
-	return 0, fmt.Errorf("one of triangle input parameters is 0, base: %v height %v", t.base, t.height)
-}
-
-func (r *Rectangle) GetArea() (any, error) {
-	if r.width > 0 && r.height > 0 {
-		return r.width * r.height, nil
-	}
-	return 0, fmt.Errorf("one of rectangle input parameters is 0, width: %v height %v", r.width, r.height)
-}
-
-func (c *Circle) GetArea() (any, error) {
-	if c.radius > 0 {
-		return (c.radius * c.radius) * math.Pi, nil
-	}
-	return 0, fmt.Errorf("circle input parameter is 0, radius: %v", c.radius)
+type Kukareku interface {
+	GetBeer() any
 }
 
 func calculateArea(s any) (any, error) {
@@ -58,11 +24,12 @@ func calculateArea(s any) (any, error) {
 }
 
 func main() {
-	a := &Triangle{base: 1, height: 6}
-	b := &Rectangle{width: 5, height: 6}
-	c := &Circle{radius: 5}
-	d := &Squere{side: 212}
-	e := &Circle{radius: 0}
+	var a Shape = figure.NewTriangle(22, 98)
+	var b Shape = figure.NewRectangle(3, 44)
+	var c Shape = figure.NewCircle(8)
+	var d Kukareku = &figure.Squere{Side: 212}
+	var e Shape = figure.NewCircle(0)
+	var f Shape = figure.NewRectangle(0, 1)
 
 	if triangle, err := calculateArea(a); err != nil {
 		fmt.Printf("unable to calculate area: %v\n", err)
@@ -89,6 +56,12 @@ func main() {
 	}
 
 	if zero, err := calculateArea(e); err != nil {
+		fmt.Printf("unable to calculate area: %v\n", err)
+	} else {
+		fmt.Printf("squere area is: %v\n", zero)
+	}
+
+	if zero, err := calculateArea(f); err != nil {
 		fmt.Printf("unable to calculate area: %v\n", err)
 	} else {
 		fmt.Printf("squere area is: %v\n", zero)
