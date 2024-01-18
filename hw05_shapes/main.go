@@ -7,14 +7,14 @@ import (
 )
 
 type Shape interface {
-	GetArea() (any, error)
+	GetArea() (float32, error)
 }
 
 type Kukareku interface {
 	GetBeer() any
 }
 
-func calculateArea(s any) (any, error) {
+func calculateArea(s any) (float32, error) {
 	switch t := s.(type) {
 	case Shape:
 		return s.(Shape).GetArea()

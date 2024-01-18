@@ -6,17 +6,17 @@ import (
 )
 
 type Triangle struct {
-	base   uint16
-	height uint16
+	base   float32
+	height float32
 }
 
 type Rectangle struct {
-	width  uint16
-	height uint16
+	width  float32
+	height float32
 }
 
 type Circle struct {
-	radius float64
+	radius float32
 }
 
 type Squere struct {
@@ -28,43 +28,43 @@ func (s *Squere) GetBeer() any {
 	return 1
 }
 
-func (t *Triangle) GetArea() (any, error) {
+func (t *Triangle) GetArea() (float32, error) {
 	if t.base > 0 && t.height > 0 {
 		return (t.base * t.height) / 2, nil
 	}
 	return 0, fmt.Errorf("one of triangle input parameters is 0, base: %v height %v", t.base, t.height)
 }
 
-func (r *Rectangle) GetArea() (any, error) {
+func (r *Rectangle) GetArea() (float32, error) {
 	if r.width > 0 && r.height > 0 {
 		return r.width * r.height, nil
 	}
 	return 0, fmt.Errorf("one of rectangle input parameters is 0, width: %v height %v", r.width, r.height)
 }
 
-func (c *Circle) GetArea() (any, error) {
+func (c *Circle) GetArea() (float32, error) {
 	if c.radius > 0 {
 		return (c.radius * c.radius) * math.Pi, nil
 	}
 	return 0, fmt.Errorf("circle input parameter is 0, radius: %v", c.radius)
 }
 
-func NewTriangle(b uint16, h uint16) *Triangle {
+func NewTriangle(base float32, height float32) *Triangle {
 	return &Triangle{
-		base:   b,
-		height: h,
+		base:   base,
+		height: height,
 	}
 }
 
-func NewRectangle(w uint16, h uint16) *Rectangle {
+func NewRectangle(width float32, height float32) *Rectangle {
 	return &Rectangle{
-		width:  w,
-		height: h,
+		width:  width,
+		height: height,
 	}
 }
 
-func NewCircle(r float64) *Circle {
+func NewCircle(radius float32) *Circle {
 	return &Circle{
-		radius: r,
+		radius: radius,
 	}
 }
