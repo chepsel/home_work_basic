@@ -1,4 +1,4 @@
-package internal
+package books
 
 type Book struct {
 	id     string
