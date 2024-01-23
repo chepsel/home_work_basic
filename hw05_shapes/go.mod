@@ -1,3 +1,3 @@
-module github.com/fixme_my_friend/hw05_shapes
+module github.com/chepsel/home_work_basic/hw05_shapes
 
-go 1.20
+go 1.21
