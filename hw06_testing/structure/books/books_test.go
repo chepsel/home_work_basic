@@ -10,7 +10,7 @@ func TestNewBook(t *testing.T) {
 	const id, title, author string = "1", "2", "3"
 	const year, size uint16 = 3, 2
 	const rate float32 = 2.2
-	var want *Book = &Book{id: id, title: title, author: author, year: year, size: size, rate: rate}
+	want := &Book{id: id, title: title, author: author, year: year, size: size, rate: rate}
 	got := NewBook(id, title, author, year, size, rate)
 	assert.Equal(t, want, got)
 }
