@@ -2,10 +2,7 @@ module github.com/chepsel/home_work_basic/hw06_testing
 
 go 1.21
 
-require (
-	github.com/kulti/titlecase v0.0.0-20200224064438-b92376e612e5
-	github.com/stretchr/testify v1.8.4
-)
+require github.com/stretchr/testify v1.8.4
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
