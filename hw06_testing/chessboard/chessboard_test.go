@@ -54,9 +54,9 @@ func TestChessboard(t *testing.T) { // tdt - шаблон готовый для 
 			want:   "# #\n # \n# #\n",
 		},
 		{
-			desc:   "12 elements",
-			input1: 12,
-			want:   "# # # # # # \n # # # # # #\n# # # # # # \n # # # # # #\n# # # # # # \n # # # # # #\n# # # # # # \n # # # # # #\n# # # # # # \n # # # # # #\n# # # # # # \n # # # # # #\n",
+			desc:   "5 elements",
+			input1: 5,
+			want:   "# # #\n # # \n# # #\n # # \n# # #\n",
 		},
 		{
 			desc:   "0 elements",

@@ -61,19 +61,19 @@ func TestFigureAreaErr(t *testing.T) { // tdt - шаблон готовый дл
 	}
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
-			if tC.input3 == 0 && tC.input4 == 0 {
+			switch {
+			case tC.input3 == 0 && tC.input4 == 0:
 				_, err := tC.input1.FigureArea(tC.input2)
 				assert.Equal(t, tC.want, err)
-			} else if tC.input3 != 0 && tC.input4 == 0 {
+			case (tC.input3 != 0 && tC.input4 == 0):
 				_, err := tC.input1.FigureArea(tC.input2, tC.input3)
 				assert.Equal(t, tC.want, err)
-			} else if tC.input3 != 0 && tC.input4 != 0 {
+			case tC.input3 != 0 && tC.input4 != 0:
 				_, err := tC.input1.FigureArea(tC.input2, tC.input3, tC.input4)
 				assert.Equal(t, tC.want, err)
-			} else {
+			default:
 				t.Errorf("somthing wrong")
 			}
-
 		})
 	}
 }
@@ -122,7 +122,6 @@ func TestFigureArea(t *testing.T) { // tdt - шаблон готовый для 
 				}
 				assert.Equal(t, tC.want, got)
 			}
-
 		})
 	}
 }
