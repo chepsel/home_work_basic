@@ -127,7 +127,7 @@ func TestNewCircle(t *testing.T) {
 }
 
 func TestGetAreaRectangleErr(t *testing.T) {
-	var input *Rectangle = &Rectangle{
+	input := &Rectangle{
 		width:  0,
 		height: 1,
 	}
@@ -138,7 +138,7 @@ func TestGetAreaRectangleErr(t *testing.T) {
 }
 
 func TestGetAreaTriangle(t *testing.T) {
-	var input *Triangle = &Triangle{
+	input := &Triangle{
 		base:   6.2,
 		height: 8.5,
 	}
@@ -151,7 +151,7 @@ func TestGetAreaTriangle(t *testing.T) {
 }
 
 func TestGetAreaTriangleErr(t *testing.T) {
-	var input *Triangle = &Triangle{
+	input := &Triangle{
 		base:   0,
 		height: 1,
 	}
@@ -162,7 +162,7 @@ func TestGetAreaTriangleErr(t *testing.T) {
 }
 
 func TestGetAreaRectangle(t *testing.T) {
-	var input *Rectangle = &Rectangle{
+	input := &Rectangle{
 		width:  5,
 		height: 8.5,
 	}
@@ -175,7 +175,7 @@ func TestGetAreaRectangle(t *testing.T) {
 }
 
 func TestGetAreaCircleErr(t *testing.T) {
-	var input *Circle = &Circle{
+	input := &Circle{
 		radius: 0,
 	}
 	_, err := input.GetArea()
@@ -185,7 +185,7 @@ func TestGetAreaCircleErr(t *testing.T) {
 }
 
 func TestGetAreaCircle(t *testing.T) {
-	var input *Circle = &Circle{
+	input := &Circle{
 		radius: 5,
 	}
 	var want float32 = 78.53982

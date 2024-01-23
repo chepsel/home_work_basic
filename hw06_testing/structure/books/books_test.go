@@ -7,14 +7,11 @@ import (
 )
 
 func TestNewBook(t *testing.T) {
-	var i string = "1"
-	var title string = "2"
-	var a string = "3"
-	var y uint16 = 3
-	var s uint16 = 2
-	var r float32 = 2.2
-	var want *Book = &Book{id: i, title: title, author: a, year: y, size: s, rate: r}
-	got := NewBook(i, title, a, y, s, r)
+	const id, title, author string = "1", "2", "3"
+	const year, size uint16 = 3, 2
+	const rate float32 = 2.2
+	var want *Book = &Book{id: id, title: title, author: author, year: year, size: size, rate: rate}
+	got := NewBook(id, title, author, year, size, rate)
 	assert.Equal(t, want, got)
 }
 
