@@ -7,9 +7,7 @@ import (
 	"unicode"
 )
 
-var (
-	ErrWrongValue = errors.New("wrong string, doesn't contain value")
-)
+var ErrWrongValue = errors.New("wrong string, doesn't contain value")
 
 func countWords(words string) (map[string]int, error) {
 	list, err := makeString(words)
@@ -20,11 +18,10 @@ func countWords(words string) (map[string]int, error) {
 	for _, item := range list {
 		_, exist := duplicatesCount[item]
 		if exist {
-			duplicatesCount[item] += 1
+			duplicatesCount[item]++
 		} else {
 			duplicatesCount[item] = 1
 		}
-
 	}
 	return duplicatesCount, nil
 }
@@ -34,9 +31,8 @@ func validateString(value string) string {
 		if unicode.IsLetter(r) {
 			if unicode.IsUpper(r) {
 				return unicode.ToLower(r)
-			} else {
-				return r
 			}
+			return r
 		}
 		return rune(0)
 	}
@@ -47,18 +43,15 @@ func makeString(input string) ([]string, error) {
 	words := strings.Split(input, " ")
 	var result []string
 	for _, word := range words {
-		value := strings.Replace(validateString(word), "\x00", "", -1)
-		switch {
-		case len(value) > 0:
+		value := strings.ReplaceAll(validateString(word), "\x00", "")
+		if len(value) > 0 {
 			result = append(result, value)
 		}
-
 	}
 	if len(result) > 0 {
 		return result, nil
-	} else {
-		return nil, ErrWrongValue
 	}
+	return nil, ErrWrongValue
 }
 
 func printResults(duplicatesMap map[string]int) {
