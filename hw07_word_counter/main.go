@@ -9,19 +9,21 @@ import (
 
 var ErrWrongValue = errors.New("wrong string, doesn't contain value")
 
-func countWords(words string) (map[string]int, error) {
-	list, err := makeString(words)
-	if err != nil {
-		return nil, err
+func makeString(inputStr string) (map[string]int, error) {
+	words := strings.Split(inputStr, " ")
+	var list []string
+	for _, word := range words {
+		value := strings.ReplaceAll(validateString(word), "\x00", "")
+		if len(value) > 0 {
+			list = append(list, value)
+		}
+	}
+	if len(list) == 0 {
+		return nil, ErrWrongValue
 	}
 	duplicatesCount := make(map[string]int)
 	for _, item := range list {
-		_, exist := duplicatesCount[item]
-		if exist {
-			duplicatesCount[item]++
-		} else {
-			duplicatesCount[item] = 1
-		}
+		duplicatesCount[item]++
 	}
 	return duplicatesCount, nil
 }
@@ -39,33 +41,14 @@ func validateString(value string) string {
 	return strings.Map(clean, value)
 }
 
-func makeString(input string) ([]string, error) {
-	words := strings.Split(input, " ")
-	var result []string
-	for _, word := range words {
-		value := strings.ReplaceAll(validateString(word), "\x00", "")
-		if len(value) > 0 {
-			result = append(result, value)
-		}
-	}
-	if len(result) > 0 {
-		return result, nil
-	}
-	return nil, ErrWrongValue
-}
-
-func printResults(duplicatesMap map[string]int) {
-	for k, v := range duplicatesMap {
-		fmt.Printf("%s:%d\n", k, v)
-	}
-}
-
 func main() {
 	msg := "один два: три,    четыре пять шесть, один два. кукареку \n    Четыре восемь игнат димас шесть"
-	words, err := countWords(msg) // делаем массив из текста
+	words, err := makeString(msg) // делаем массив из текста
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		printResults(words)
+		for k, v := range words {
+			fmt.Printf("%s:%d\n", k, v)
+		}
 	}
 }

@@ -17,17 +17,36 @@ func TestMakeString(t *testing.T) {
 			desc:   "check array(1)",
 			input1: "раз два: три, четыре пять шесть, \r  string int rune, раз",
 			input2: true,
-			want:   []string{"раз", "два", "три", "четыре", "пять", "шесть", "string", "int", "rune", "раз"},
+			want: map[string]int{
+				"int":    1,
+				"rune":   1,
+				"string": 1,
+				"два":    1,
+				"пять":   1,
+				"раз":    2,
+				"три":    1,
+				"четыре": 1,
+				"шесть":  1,
+			},
 		},
 		{
 			desc:   "check array(2)",
 			input1: "Как дела?",
 			input2: true,
-			want:   []string{"как", "дела"},
+			want: map[string]int{
+				"дела": 1,
+				"как":  1,
+			},
 		},
 		{
 			desc:   "check error(1)",
 			input1: " , . \n \r ?",
+			input2: false,
+			want:   ErrWrongValue,
+		},
+		{
+			desc:   "check error(2)",
+			input1: "",
 			input2: false,
 			want:   ErrWrongValue,
 		},
@@ -81,52 +100,6 @@ func TestValidateString(t *testing.T) {
 		t.Run(tC.desc, func(t *testing.T) {
 			got := validateString(tC.input1)
 			assert.Equal(t, tC.want, got)
-		})
-	}
-}
-
-func TestCountWords(t *testing.T) {
-	testCases := []struct {
-		want      map[string]int
-		desc      string
-		testError bool
-		input1    string
-		wantErr   error
-	}{
-		{
-			desc:      "check words(1)",
-			input1:    "слово dsd слово",
-			testError: false,
-			want:      map[string]int{"dsd": 1, "слово": 2},
-		},
-		{
-			desc:      "check emty(1)",
-			input1:    "",
-			testError: false,
-			want:      nil,
-		},
-		{
-			desc:      "check words(2)",
-			input1:    "раз два три",
-			testError: false,
-			want:      map[string]int{"раз": 1, "два": 1, "три": 1},
-		},
-		{
-			desc:      "check error(1)",
-			input1:    "",
-			testError: true,
-			wantErr:   ErrWrongValue,
-		},
-	}
-	for _, tC := range testCases {
-		t.Run(tC.desc, func(t *testing.T) {
-			if tC.testError == false {
-				got, _ := countWords(tC.input1)
-				assert.Equal(t, tC.want, got)
-			} else if tC.testError == true {
-				_, err := countWords(tC.input1)
-				assert.Equal(t, tC.wantErr, err)
-			}
 		})
 	}
 }
