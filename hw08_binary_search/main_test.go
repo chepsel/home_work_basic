@@ -74,10 +74,10 @@ func TestBinarySearch(t *testing.T) {
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
 			if typeofObject(tC.want) == "boolean" {
-				_, got := binarySearch(&tC.input1, tC.input2)
+				_, got := binarySearch(tC.input1, tC.input2)
 				assert.Equal(t, tC.want, got)
 			} else {
-				got, _ := binarySearch(&tC.input1, tC.input2)
+				got, _ := binarySearch(tC.input1, tC.input2)
 				assert.Equal(t, tC.want, got)
 			}
 		})

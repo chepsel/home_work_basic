@@ -16,26 +16,25 @@ func NewCryptoRand(limit int) int {
 	return int(safeNum.Int64())
 }
 
-func randArr(array *[]int, elements int) []int {
+func randArr(array []int, elements int) []int {
 	for i := 0; i < elements; i++ {
-		(*array)[i] = NewCryptoRand(elements * 2)
+		(array)[i] = NewCryptoRand(elements * 2)
 	}
-	sort.Ints(*array)
-	return (*array)
+	sort.Ints(array)
+	return (array)
 }
 
-func binarySearch(array *[]int, lookingFor int) (int, bool) {
+func binarySearch(array []int, lookingFor int) (int, bool) {
 	var midle, currentValue, o int
 
 	min := 0
-	top := len(*array) - 1
+	top := len(array) - 1
 
 	for min <= top {
 		o++
 		midle = (min + top) / 2
-		currentValue = (*array)[midle]
+		currentValue = (array)[midle]
 		if currentValue == lookingFor {
-			fmt.Printf("O(%d)\n", o)
 			return currentValue, true
 		}
 		if currentValue > lookingFor {
@@ -44,7 +43,6 @@ func binarySearch(array *[]int, lookingFor int) (int, bool) {
 			min = midle + 1
 		}
 	}
-	fmt.Printf("O(%d)\n", o)
 	return 0, false
 }
 
@@ -53,9 +51,9 @@ func main() {
 	lookingFor := NewCryptoRand(elements)
 	array := make([]int, elements)
 
-	randArr(&array, elements)
+	randArr(array, elements)
 
-	assumption, result := binarySearch(&array, lookingFor)
+	assumption, result := binarySearch(array, lookingFor)
 	if result {
 		fmt.Println("Found: " + strconv.Itoa(assumption))
 		fmt.Println(array)
