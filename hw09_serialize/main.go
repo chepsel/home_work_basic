@@ -34,10 +34,8 @@ type Message interface {
 }
 
 func UnmarshalProto(marshaled []byte, unmarshaled Message) error {
-	if err := proto.Unmarshal(marshaled, unmarshaled); err != nil {
-		return err
-	}
-	return nil
+	err := proto.Unmarshal(marshaled, unmarshaled)
+	return err
 }
 
 func ToProtobufStructure(book *books.Book) Message {
