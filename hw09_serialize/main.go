@@ -13,18 +13,14 @@ type ProtocBook struct {
 	Books []protoc.Book
 }
 
-type ProtocBinary struct {
-	book []byte
-}
-
 type Marshaller interface {
 	MarshalJSON() ([]byte, error)
-	MarshalProto() ([]ProtocBinary, error)
+	MarshalProto() ([]byte, error)
 }
 
 type Unmarshaller interface {
 	UnmarshalJSON([]byte) error
-	UnmarshalProto(marshaled []ProtocBinary) error
+	UnmarshalProto(marshaled []byte) error
 }
 
 type Message interface {
@@ -38,39 +34,34 @@ type Message interface {
 	GetAuthor() string
 }
 
-func (protoBook *ProtocBook) MarshalProto() ([]ProtocBinary, error) {
-	finalStructure := make([]ProtocBinary, len(protoBook.Books))
-	for i := range protoBook.Books {
-		if protoBook.Books[i].ProtoReflect().IsValid() {
-			var ctr Message = &protoBook.Books[i]
-			marshaled, err := proto.Marshal(ctr)
-			if err == nil {
-				finalStructure[i].book = marshaled
-			} else {
-				return nil, err
-			}
+func MarshalProto(protoBook *protoc.BooksSlice) ([]byte, error) {
+	var marshaled []byte
+	var err error
+	clonedBook := proto.Clone(protoBook).(*protoc.BooksSlice)
+	if protoBook.ProtoReflect().IsValid() {
+		marshaled, err = proto.Marshal(clonedBook)
+		if err != nil {
+			return nil, err
 		}
 	}
-	return finalStructure, nil
+	return marshaled, nil
 }
 
-func UnmarshalProto(marshaled []ProtocBinary) (ProtocBook, error) {
-	var protoBook ProtocBook
-	protoBook.Books = make([]protoc.Book, len(marshaled))
-	for i := range marshaled {
-		err := proto.Unmarshal(marshaled[i].book, &protoBook.Books[i])
-		if err != nil {
-			return protoBook, err
-		}
+func UnmarshalProto(marshaled []byte) (*protoc.BooksSlice, error) {
+	protoBook := &protoc.BooksSlice{}
+	err := proto.Unmarshal(marshaled, protoBook)
+	if err != nil {
+		result := proto.Clone(protoBook).(*protoc.BooksSlice)
+		return result, err
 	}
 	return protoBook, nil
 }
 
-func ToProtobufStructure(bookSlice *books.JSONBook) ProtocBook {
-	var protoBooks ProtocBook
-	protoBooks.Books = make([]protoc.Book, len(bookSlice.Books))
+func ToProtobufStructure(bookSlice *books.JSONBook) *protoc.BooksSlice {
+	protoBooks := &protoc.BooksSlice{}
+	protoBooks.Books = make([]*protoc.Book, len(bookSlice.Books))
 	for i, element := range bookSlice.Books {
-		protoBooks.Books[i] = protoc.Book{
+		protoBooks.Books[i] = &protoc.Book{
 			ID:     element.ID,
 			Title:  element.Title,
 			Author: element.Author,
@@ -79,7 +70,8 @@ func ToProtobufStructure(bookSlice *books.JSONBook) ProtocBook {
 			Rate:   element.Rate,
 		}
 	}
-	return protoBooks
+	result := proto.Clone(protoBooks).(*protoc.BooksSlice)
+	return result
 }
 
 func main() {
@@ -123,18 +115,22 @@ func main() {
 
 	protoBook := ToProtobufStructure(bookNew)
 
-	marshaled, errProto := protoBook.MarshalProto()
+	marshaled, errProto := MarshalProto(protoBook)
 	if errProto != nil {
 		fmt.Println("error is:", errProto)
 	}
-	for i := range marshaled {
-		fmt.Printf("\n----\nMarshaled protoc message[%v]:%s\n-----\n", i, marshaled[i].book)
-	}
+
+	// proto.Message(protoBook.ProtoReflect())
+
+	fmt.Printf("\n----\nMarshaled protoc message:%s\n-----\n", marshaled)
+	// for i := range marshaled {
+	// 	fmt.Printf("\n----\nMarshaled protoc message[%v]:%s\n-----\n", i, marshaled[i].book)
+	// }
 	protoBookNew, errUnmarshalProto := UnmarshalProto(marshaled)
 	if errUnmarshalProto != nil {
 		fmt.Println("error is:", errUnmarshalProto)
 	}
 	for i := range protoBookNew.Books {
-		fmt.Println("Unmarshled Protoc element of protoBookNew[", i, "]:", proto.Clone(&protoBookNew.Books[i]).(*protoc.Book))
+		fmt.Println("Unmarshled Protoc element of protoBookNew[", i, "]:", protoBookNew.Books[i])
 	}
 }

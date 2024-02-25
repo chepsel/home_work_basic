@@ -13,3 +13,6 @@ message Book {
     float Rate = 6;
 }
 
+message BooksSlice {
+  repeated Book Books = 1;
+}
