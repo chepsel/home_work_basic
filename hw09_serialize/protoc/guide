@@ -1,1 +1,4 @@
 protoc --go_out=. --go_opt=paths=source_relative ./protoc/book.proto
+
+
+Useful sample - https://golang-blog.blogspot.com/2021/04/protocol-buffer-basics-golang.html

@@ -13,28 +13,26 @@ func TestToProtobufStructure(t *testing.T) {
 	testCases := []struct {
 		want      *protoc.BooksSlice
 		desc      string
-		input1    *books.JSONBook
+		input1    []*books.Book
 		testError bool
 	}{
 		{
 			desc: "check valid",
-			input1: &books.JSONBook{
-				Books: []books.Book{
-					{
-						ID:     "978-5-389-21499-6",
-						Title:  "Элегантность ежика",
-						Author: "Мюриель Барбери",
-						Year:   2009,
-						Size:   400,
-						Rate:   2.4,
-					}, {
-						ID:     "978-5-389-21499-6",
-						Title:  "Элегантность ежика",
-						Author: "Мюриель Барбери",
-						Year:   2009,
-						Size:   400,
-						Rate:   2.4,
-					},
+			input1: []*books.Book{
+				{
+					ID:     "978-5-389-21499-6",
+					Title:  "Элегантность ежика",
+					Author: "Мюриель Барбери",
+					Year:   2009,
+					Size:   400,
+					Rate:   2.4,
+				}, {
+					ID:     "978-5-389-21499-6",
+					Title:  "Элегантность ежика",
+					Author: "Мюриель Барбери",
+					Year:   2009,
+					Size:   400,
+					Rate:   2.4,
 				},
 			},
 			want: &protoc.BooksSlice{
@@ -60,15 +58,13 @@ func TestToProtobufStructure(t *testing.T) {
 		},
 		{
 			desc: "check missing rate",
-			input1: &books.JSONBook{
-				Books: []books.Book{
-					{
-						ID:     "978-5-389-21499-6",
-						Title:  "Элегантность ежика",
-						Author: "Мюриель Барбери",
-						Year:   2009,
-						Size:   400,
-					},
+			input1: []*books.Book{
+				{
+					ID:     "978-5-389-21499-6",
+					Title:  "Элегантность ежика",
+					Author: "Мюриель Барбери",
+					Year:   2009,
+					Size:   400,
 				},
 			},
 			want: &protoc.BooksSlice{
@@ -86,21 +82,19 @@ func TestToProtobufStructure(t *testing.T) {
 		},
 		{
 			desc: "check missing size and rate",
-			input1: &books.JSONBook{
-				Books: []books.Book{
-					{
-						ID:     "978-5-389-21499-6",
-						Title:  "Элегантность ежика",
-						Author: "Мюриель Барбери",
-						Year:   2009,
-						Rate:   2.4,
-					}, {
-						ID:     "978-5-389-21499-6",
-						Title:  "Элегантность ежика",
-						Author: "Мюриель Барбери",
-						Year:   2009,
-						Size:   400,
-					},
+			input1: []*books.Book{
+				{
+					ID:     "978-5-389-21499-6",
+					Title:  "Элегантность ежика",
+					Author: "Мюриель Барбери",
+					Year:   2009,
+					Rate:   2.4,
+				}, {
+					ID:     "978-5-389-21499-6",
+					Title:  "Элегантность ежика",
+					Author: "Мюриель Барбери",
+					Year:   2009,
+					Size:   400,
 				},
 			},
 			want: &protoc.BooksSlice{
@@ -124,14 +118,12 @@ func TestToProtobufStructure(t *testing.T) {
 		},
 		{
 			desc: "check one element",
-			input1: &books.JSONBook{
-				Books: []books.Book{
-					{
-						ID:     "978-5-389-21499-6",
-						Title:  "Элегантность ежика",
-						Author: "Мюриель Барбери",
-						Year:   2009,
-					},
+			input1: []*books.Book{
+				{
+					ID:     "978-5-389-21499-6",
+					Title:  "Элегантность ежика",
+					Author: "Мюриель Барбери",
+					Year:   2009,
 				},
 			},
 			want: &protoc.BooksSlice{
@@ -168,13 +160,13 @@ func TestUnmarshalProto(t *testing.T) {
 	testCases := []struct {
 		want      protoc.BooksSlice
 		desc      string
-		input1    *books.JSONBook
+		input1    []*books.Book
 		input2    []byte
 		testError bool
 	}{
 		{
 			desc:   "check valid",
-			input1: &books.JSONBook{},
+			input1: []*books.Book{},
 			want: protoc.BooksSlice{
 				Books: []*protoc.Book{
 					{
@@ -199,7 +191,7 @@ func TestUnmarshalProto(t *testing.T) {
 		},
 		{
 			desc:   "check missing rate and size",
-			input1: &books.JSONBook{},
+			input1: []*books.Book{},
 			want: protoc.BooksSlice{
 				Books: []*protoc.Book{
 					{
@@ -220,7 +212,7 @@ func TestUnmarshalProto(t *testing.T) {
 		},
 		{
 			desc:   "check one",
-			input1: &books.JSONBook{},
+			input1: []*books.Book{},
 			want: protoc.BooksSlice{
 				Books: []*protoc.Book{
 					{
@@ -236,7 +228,7 @@ func TestUnmarshalProto(t *testing.T) {
 		},
 		{
 			desc:   "check error",
-			input1: &books.JSONBook{},
+			input1: []*books.Book{},
 			want: protoc.BooksSlice{
 				Books: []*protoc.Book{
 					{
@@ -285,30 +277,28 @@ func TestUnmarshalProto(t *testing.T) {
 
 func TestMarshalProto(t *testing.T) {
 	testCases := []struct {
-		input1    *books.JSONBook
+		input1    []*books.Book
 		desc      string
 		want      []byte
 		testError bool
 	}{
 		{
 			desc: "check valid",
-			input1: &books.JSONBook{
-				Books: []books.Book{
-					{
-						ID:     "978-5-389-21499-6",
-						Title:  "Элегантность ежика",
-						Author: "Мюриель Барбери",
-						Year:   2009,
-						Size:   400,
-						Rate:   2.4,
-					}, {
-						ID:     "978-5-389-21499-6",
-						Title:  "Элегантность ежика",
-						Author: "Мюриель Барбери",
-						Year:   2009,
-						Size:   400,
-						Rate:   2.4,
-					},
+			input1: []*books.Book{
+				{
+					ID:     "978-5-389-21499-6",
+					Title:  "Элегантность ежика",
+					Author: "Мюриель Барбери",
+					Year:   2009,
+					Size:   400,
+					Rate:   2.4,
+				}, {
+					ID:     "978-5-389-21499-6",
+					Title:  "Элегантность ежика",
+					Author: "Мюриель Барбери",
+					Year:   2009,
+					Size:   400,
+					Rate:   2.4,
 				},
 			},
 			want:      []byte("\nb" + protoShit1 + protoShit2 + "\nb" + protoShit1 + protoShit2),
@@ -316,21 +306,19 @@ func TestMarshalProto(t *testing.T) {
 		},
 		{
 			desc: "check missing rate",
-			input1: &books.JSONBook{
-				Books: []books.Book{
-					{
-						ID:     "978-5-389-21499-6",
-						Title:  "Элегантность ежика",
-						Author: "Мюриель Барбери",
-						Year:   2009,
-						Size:   400,
-					}, {
-						ID:     "978-5-389-21499-6",
-						Title:  "Элегантность ежика",
-						Author: "Мюриель Барбери",
-						Year:   2009,
-						Size:   400,
-					},
+			input1: []*books.Book{
+				{
+					ID:     "978-5-389-21499-6",
+					Title:  "Элегантность ежика",
+					Author: "Мюриель Барбери",
+					Year:   2009,
+					Size:   400,
+				}, {
+					ID:     "978-5-389-21499-6",
+					Title:  "Элегантность ежика",
+					Author: "Мюриель Барбери",
+					Year:   2009,
+					Size:   400,
 				},
 			},
 			want:      []byte("\n]" + protoShit1 + protoShit5 + "\n]" + protoShit1 + protoShit5),
@@ -338,19 +326,17 @@ func TestMarshalProto(t *testing.T) {
 		},
 		{
 			desc: "check missing size and rate",
-			input1: &books.JSONBook{
-				Books: []books.Book{
-					{
-						ID:     "978-5-389-21499-6",
-						Title:  " ежика",
-						Author: "Мюриель Барбери",
-						Year:   2009,
-					}, {
-						ID:     "978-5-389-21499-6",
-						Title:  "Элегантность ежикa",
-						Author: "Мюриель Барбери",
-						Year:   2009,
-					},
+			input1: []*books.Book{
+				{
+					ID:     "978-5-389-21499-6",
+					Title:  " ежика",
+					Author: "Мюриель Барбери",
+					Year:   2009,
+				}, {
+					ID:     "978-5-389-21499-6",
+					Title:  "Элегантность ежикa",
+					Author: "Мюриель Барбери",
+					Year:   2009,
 				},
 			},
 			want:      []byte("\nB" + protoShit1 + protoShit3 + "\nY" + protoShit1 + protoShit4),
@@ -358,14 +344,12 @@ func TestMarshalProto(t *testing.T) {
 		},
 		{
 			desc: "check one",
-			input1: &books.JSONBook{
-				Books: []books.Book{
-					{
-						ID:     "978-5-389-21499-6",
-						Title:  " ежика",
-						Author: "Мюриель Барбери",
-						Year:   2009,
-					},
+			input1: []*books.Book{
+				{
+					ID:     "978-5-389-21499-6",
+					Title:  " ежика",
+					Author: "Мюриель Барбери",
+					Year:   2009,
 				},
 			},
 			want:      []byte("\nB" + protoShit1 + protoShit3),
@@ -382,6 +366,96 @@ func TestMarshalProto(t *testing.T) {
 				}
 			} else {
 				assert.Equal(t, string(tC.want), string(got))
+			}
+		})
+	}
+}
+
+func TestMarshalJSONSlice(t *testing.T) {
+	testCases := []struct {
+		want1     []byte
+		want2     []byte
+		desc      string
+		input1    []*books.Book
+		input2    []*books.Book
+		testError bool
+	}{
+		{
+			desc:   "check valid",
+			want1:  []byte(`[{"id":"1","title":"е","author":"МБ","year":2,"size":40,"rate":2.4}`),
+			want2:  []byte(`,{"id":"2","title":"б","author":"МБ","year":7,"size":30}]`),
+			input2: []*books.Book{},
+			input1: []*books.Book{
+				{
+					ID:     "1",
+					Title:  "е",
+					Author: "МБ",
+					Year:   2,
+					Size:   40,
+					Rate:   2.4,
+				}, {
+					ID:     "2",
+					Title:  "б",
+					Author: "МБ",
+					Year:   7,
+					Size:   30,
+				},
+			},
+			testError: false,
+		},
+		{
+			desc:   "check one",
+			want1:  []byte(`[{"id":"978","title":"ежик","author":"Мюриель Барбери","year":2009,"size":400}]`),
+			input2: []*books.Book{},
+			input1: []*books.Book{
+				{
+					ID:     "978",
+					Title:  "ежик",
+					Author: "Мюриель Барбери",
+					Year:   2009,
+					Size:   400,
+				},
+			},
+			testError: false,
+		},
+		{
+			desc:   "check missing size",
+			want1:  []byte(`[{"id":"1","title":"е","author":"МБ","year":2,"size":40,"rate":2.4}`),
+			want2:  []byte(`,{"id":"2","title":"б","year":0}]`),
+			input2: []*books.Book{},
+			input1: []*books.Book{
+				{
+					ID:     "1",
+					Title:  "е",
+					Author: "МБ",
+					Year:   2,
+					Size:   40,
+					Rate:   2.4,
+				}, {
+					ID:    "2",
+					Title: "б",
+				},
+			},
+			testError: false,
+		},
+		{
+			desc:      "check missing all",
+			want1:     []byte(`[]`),
+			input2:    []*books.Book{},
+			input1:    []*books.Book{},
+			testError: false,
+		},
+	}
+	for _, tC := range testCases {
+		t.Run(tC.desc, func(t *testing.T) {
+			got, err := MarshalJSONSlice(tC.input1)
+			if tC.testError {
+				if err == nil {
+					t.Errorf("missing error")
+				}
+			} else {
+				tC.want1 = append(tC.want1, tC.want2...)
+				assert.Equal(t, string(tC.want1), string(got))
 			}
 		})
 	}

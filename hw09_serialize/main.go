@@ -9,9 +9,15 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
-type ProtocBook struct {
-	Books []protoc.Book
+type SentinelError string
+
+func (err SentinelError) Error() string {
+	return string(err)
 }
+
+const (
+	EmptySlice SentinelError = "Empty slice"
+)
 
 type Marshaller interface {
 	MarshalJSON() ([]byte, error)
@@ -25,7 +31,7 @@ type Unmarshaller interface {
 
 type Message interface {
 	String() string
-	ProtoReflect() protoreflect.Message
+	ProtoReflect() protoreflect.Message // позволяет использовать вложенные в пакет protoc методы
 	GetID() string
 	GetRate() float32
 	GetYear() uint32
@@ -38,7 +44,7 @@ func MarshalProto(protoBook *protoc.BooksSlice) ([]byte, error) {
 	var marshaled []byte
 	var err error
 	clonedBook := proto.Clone(protoBook).(*protoc.BooksSlice)
-	if protoBook.ProtoReflect().IsValid() {
+	if protoBook.ProtoReflect().IsValid() { // комманда проверки валидности
 		marshaled, err = proto.Marshal(clonedBook)
 		if err != nil {
 			return nil, err
@@ -51,16 +57,16 @@ func UnmarshalProto(marshaled []byte) (*protoc.BooksSlice, error) {
 	protoBook := &protoc.BooksSlice{}
 	err := proto.Unmarshal(marshaled, protoBook)
 	if err != nil {
-		result := proto.Clone(protoBook).(*protoc.BooksSlice)
+		result := proto.Clone(protoBook).(*protoc.BooksSlice) // комманда копирования которая позволяет обойти лок структуры
 		return result, err
 	}
 	return protoBook, nil
 }
 
-func ToProtobufStructure(bookSlice *books.JSONBook) *protoc.BooksSlice {
+func ToProtobufStructure(bookSlice []*books.Book) *protoc.BooksSlice {
 	protoBooks := &protoc.BooksSlice{}
-	protoBooks.Books = make([]*protoc.Book, len(bookSlice.Books))
-	for i, element := range bookSlice.Books {
+	protoBooks.Books = make([]*protoc.Book, len(bookSlice))
+	for i, element := range bookSlice {
 		protoBooks.Books[i] = &protoc.Book{
 			ID:     element.ID,
 			Title:  element.Title,
@@ -74,10 +80,47 @@ func ToProtobufStructure(bookSlice *books.JSONBook) *protoc.BooksSlice {
 	return result
 }
 
+func MarshalJSONSlice(ctr []*books.Book) ([]byte, error) {
+	var resultJSON []byte
+	if ctr != nil {
+		for i, element := range ctr {
+			if element != nil {
+				result, err := element.MarshalJSON()
+				switch {
+				case err != nil:
+					return nil, err
+				case i == 0:
+					resultJSON = result
+
+				default:
+					resultJSON = append(resultJSON, []byte(`,`)...)
+					resultJSON = append(resultJSON, result...)
+				}
+			}
+		}
+		resultJSON = append([]byte(`[`), resultJSON...)
+		resultJSON = append(resultJSON, []byte(`]`)...)
+		return resultJSON, nil
+	}
+	return nil, EmptySlice
+}
+
 func main() {
-	bookSlice := &books.JSONBook{}
-	bookSlice.Books = make([]books.Book, 5)
-	bookSlice.Books[0] = books.Book{
+	tmp := `{"id":"978","title":"Ку-Ка","author":"-Ре-Ку","year":2009,"size":400,"rate":2.4}`
+	var book books.Book
+	err := book.UnmarshalJSON([]byte(tmp))
+	if err != nil {
+		fmt.Println("error is:", err)
+	}
+	fmt.Println("Marshal one:", book)
+	result, err := book.MarshalJSON()
+	if err != nil {
+		fmt.Println("error is:", err)
+	}
+	fmt.Println("Unmarshal one:", string(result))
+
+	bookSlice := make([]*books.Book, 5)
+	bookSlice[0] = &books.Book{
 		ID:     "978",
 		Title:  "Мюриель ежик",
 		Author: "Мюриель Барбери",
@@ -85,32 +128,32 @@ func main() {
 		Size:   400,
 		Rate:   2.4,
 	}
-	bookSlice.Books[1] = books.Book{
+	bookSlice[1] = &books.Book{
 		ID:     "978",
 		Title:  "ежик Барбери",
 		Author: "Мюриель Барбери",
 		Year:   2009,
 		Rate:   2.4,
 	}
-	bookSlice.Books[4] = books.Book{
+	bookSlice[4] = &books.Book{
 		ID:     "3232-re",
 		Title:  "tttt",
 		Author: "aaaa",
 		Rate:   3.6,
 	}
-	result, err := bookSlice.MarshalJSON()
+	result, err = MarshalJSONSlice(bookSlice)
 	if err != nil {
 		fmt.Println("error is:", err)
 	}
 	fmt.Println("JSON from structure:", string(result))
-	bookNew := &books.JSONBook{}
 
-	if err = bookNew.UnmarshalJSON(result); err != nil {
-		fmt.Println("error is:", err)
+	bookNew, errUnmSlice := books.UnmarshalJSONSlice(result)
+	if errUnmSlice != nil {
+		fmt.Println("error is:", errUnmSlice)
 	}
-
-	for i, element := range bookNew.Books {
-		fmt.Println("Unmarshled JSON element of bookNew[", i, "]:", element)
+	fmt.Println("Unmarshl JSON structure:")
+	for i, element := range bookNew {
+		fmt.Println("	Unmarshled JSON element of bookNew[", i, "]:", *element)
 	}
 
 	protoBook := ToProtobufStructure(bookNew)
@@ -120,17 +163,14 @@ func main() {
 		fmt.Println("error is:", errProto)
 	}
 
-	// proto.Message(protoBook.ProtoReflect())
-
 	fmt.Printf("\n----\nMarshaled protoc message:%s\n-----\n", marshaled)
-	// for i := range marshaled {
-	// 	fmt.Printf("\n----\nMarshaled protoc message[%v]:%s\n-----\n", i, marshaled[i].book)
-	// }
+
 	protoBookNew, errUnmarshalProto := UnmarshalProto(marshaled)
 	if errUnmarshalProto != nil {
 		fmt.Println("error is:", errUnmarshalProto)
 	}
+	fmt.Println("Unmarshled Protoc structure:")
 	for i := range protoBookNew.Books {
-		fmt.Println("Unmarshled Protoc element of protoBookNew[", i, "]:", protoBookNew.Books[i])
+		fmt.Println("	Unmarshled Protoc element of protoBookNew[", i, "]:", protoBookNew.Books[i])
 	}
 }

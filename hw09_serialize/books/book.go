@@ -2,11 +2,10 @@ package books
 
 import (
 	"encoding/json"
-	"fmt"
 )
 
 type JSONBook struct {
-	Books []Book
+	Books []Book // позволяет хранить объекты как по одному так и множеством
 }
 
 type Book struct {
@@ -18,76 +17,25 @@ type Book struct {
 	Rate   float32 `json:"rate,omitempty"`
 }
 
-type SentinelError string
-
-func (err SentinelError) Error() string {
-	return string(err)
-}
-
-const (
-	EmptySlice SentinelError = "Empty slice"
-)
-
-func (ctr *JSONBook) UnmarshalJSON(b []byte) error {
-	if len(b) == 0 {
-		return fmt.Errorf("no bytes to unmarshal")
-	}
-	switch b[0] {
-	case '{':
-		return ctr.unmarshalSingle(b)
-	case '[':
-		return ctr.unmarshalMany(b)
-	}
-	err := ctr.unmarshalMany(b)
-	if err != nil {
-		return ctr.unmarshalSingle(b)
-	}
-	return nil
-}
-
-func (ctr *JSONBook) unmarshalSingle(b []byte) error {
-	var t Book
-	err := json.Unmarshal(b, &t)
+func (ctr *Book) UnmarshalJSON(data []byte) error {
+	type dropDefaultInf Book
+	err := json.Unmarshal(data, (*dropDefaultInf)(ctr))
 	if err != nil {
 		return err
 	}
-	ctr.Books = []Book{t}
 	return nil
 }
 
-func (ctr *JSONBook) unmarshalMany(b []byte) error {
-	var books []Book
-	err := json.Unmarshal(b, &books)
-	if err != nil {
-		return err
+func UnmarshalJSONSlice(data []byte) ([]*Book, error) {
+	var ctr []*Book
+	if err := json.Unmarshal(data, &ctr); err != nil {
+		return nil, err
 	}
-	ctr.Books = books
-	return nil
+	return ctr, nil
 }
 
-func (ctr *JSONBook) MarshalJSON() ([]byte, error) {
-	switch len(ctr.Books) {
-	case 0:
-		return nil, EmptySlice
-	case 1:
-		j, err := json.Marshal(ctr.Books[0])
-		return j, err
-	default:
-		var emptyBook Book
-		var resultJSON []byte
-		for i, element := range ctr.Books {
-			if element != emptyBook {
-				result, err := json.Marshal(ctr.Books[i])
-				if err == nil {
-					if len(resultJSON) > 0 {
-						resultJSON = append(resultJSON, []byte(`,`)...)
-					}
-					resultJSON = append(resultJSON, result...)
-				}
-			}
-		}
-		resultJSON = append([]byte(`[`), resultJSON...)
-		resultJSON = append(resultJSON, []byte(`]`)...)
-		return resultJSON, nil
-	}
+func (ctr *Book) MarshalJSON() ([]byte, error) {
+	type dropDefaultInf Book
+	result, err := json.Marshal((*dropDefaultInf)(ctr))
+	return result, err
 }
