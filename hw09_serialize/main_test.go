@@ -156,7 +156,7 @@ const (
 	protoShit5 = "#Элегантность ежика\x1a\x1dМюриель Барбери \xd9\x0f(\x90\x03"
 )
 
-func TestUnmarshalProto(t *testing.T) {
+func TestUnmarshalPBSlice(t *testing.T) {
 	testCases := []struct {
 		want      protoc.BooksSlice
 		desc      string
@@ -250,7 +250,7 @@ func TestUnmarshalProto(t *testing.T) {
 	}
 	for tI := range testCases {
 		t.Run(testCases[tI].desc, func(t *testing.T) {
-			protoBookNew, err := UnmarshalProto(testCases[tI].input2)
+			protoBookNew, err := UnmarshalPBSlice(testCases[tI].input2)
 			// fmt.Println(protoBookNew)
 			if testCases[tI].testError {
 				if err == nil {
@@ -275,7 +275,91 @@ func TestUnmarshalProto(t *testing.T) {
 	}
 }
 
-func TestMarshalProto(t *testing.T) {
+func TestUnmarshalPB(t *testing.T) {
+	testCases := []struct {
+		want      *protoc.Book
+		desc      string
+		input1    []*books.Book
+		input2    []byte
+		testError bool
+	}{
+		{
+			desc:   "check valid",
+			input1: []*books.Book{},
+			want: &protoc.Book{
+				ID:     "978-5-389-21499-6",
+				Title:  "Элегантность ежика",
+				Author: "Мюриель Барбери",
+				Year:   2009,
+				Size:   400,
+				Rate:   2.4,
+			},
+			input2:    []byte(protoShit1 + protoShit2),
+			testError: false,
+		},
+		{
+			desc:   "check missing rate and size",
+			input1: []*books.Book{},
+			want: &protoc.Book{
+				ID:     "978-5-389-21499-6",
+				Title:  " ежика",
+				Author: "Мюриель Барбери",
+				Year:   2009,
+			},
+			input2:    []byte(protoShit1 + protoShit3),
+			testError: false,
+		},
+		{
+			desc:   "check one",
+			input1: []*books.Book{},
+			want: &protoc.Book{
+				ID:     "978-5-389-21499-6",
+				Title:  " ежика",
+				Author: "Мюриель Барбери",
+				Year:   2009,
+			},
+			input2:    []byte(protoShit1 + protoShit3),
+			testError: false,
+		},
+		{
+			desc:   "check error",
+			input1: []*books.Book{},
+			want: &protoc.Book{
+				ID:     "978-5-389-21499-6",
+				Title:  " ежика",
+				Author: "Мюриель Барбери",
+				Year:   2009,
+			},
+			input2:    []byte("sfdsdfsdfsdf"),
+			testError: true,
+		},
+	}
+	for tI := range testCases {
+		t.Run(testCases[tI].desc, func(t *testing.T) {
+			protoBookNew, err := UnmarshalPB(testCases[tI].input2)
+			// fmt.Println(protoBookNew)
+			if testCases[tI].testError {
+				if err == nil {
+					t.Errorf("missing error")
+				}
+			} else {
+				if err != nil {
+					t.Errorf("wrong protostructure error")
+				}
+				element := proto.Clone(protoBookNew).(*protoc.Book)
+				assert.Equal(t, testCases[tI].want.GetID(), element.GetID())
+				assert.Equal(t, testCases[tI].want.GetAuthor(), element.GetAuthor())
+				assert.Equal(t, testCases[tI].want.GetRate(), element.GetRate())
+				assert.Equal(t, testCases[tI].want.GetSize(), element.GetSize())
+				assert.Equal(t, testCases[tI].want.GetYear(), element.GetYear())
+				assert.Equal(t, testCases[tI].want.GetTitle(), element.GetTitle())
+				// fmt.Printf("\nleft:%s right:%s\n", tC.want.Books[i].GetID(), element.GetID())
+			}
+		})
+	}
+}
+
+func TestMarshalPBSlice(t *testing.T) {
 	testCases := []struct {
 		input1    []*books.Book
 		desc      string
@@ -359,7 +443,76 @@ func TestMarshalProto(t *testing.T) {
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
 			tmp := ToProtobufStructure(tC.input1)
-			got, err := MarshalProto(tmp)
+			got, err := MarshalPBSlice(tmp)
+			if tC.testError {
+				if err == nil {
+					t.Errorf("missing error")
+				}
+			} else {
+				assert.Equal(t, string(tC.want), string(got))
+			}
+		})
+	}
+}
+
+func TestMarshalPB(t *testing.T) {
+	testCases := []struct {
+		input1    *protoc.Book
+		desc      string
+		want      []byte
+		testError bool
+	}{
+		{
+			desc: "check valid",
+			input1: &protoc.Book{
+				ID:     "978-5-389-21499-6",
+				Title:  "Элегантность ежика",
+				Author: "Мюриель Барбери",
+				Year:   2009,
+				Size:   400,
+				Rate:   2.4,
+			},
+			want:      []byte(protoShit1 + protoShit2),
+			testError: false,
+		},
+		{
+			desc: "check missing rate",
+			input1: &protoc.Book{
+				ID:     "978-5-389-21499-6",
+				Title:  "Элегантность ежика",
+				Author: "Мюриель Барбери",
+				Year:   2009,
+				Size:   400,
+			},
+			want:      []byte(protoShit1 + protoShit5),
+			testError: false,
+		},
+		{
+			desc: "check missing size and rate",
+			input1: &protoc.Book{
+				ID:     "978-5-389-21499-6",
+				Title:  " ежика",
+				Author: "Мюриель Барбери",
+				Year:   2009,
+			},
+			want:      []byte(protoShit1 + protoShit3),
+			testError: false,
+		},
+		{
+			desc: "check one",
+			input1: &protoc.Book{
+				ID:     "978-5-389-21499-6",
+				Title:  " ежика",
+				Author: "Мюриель Барбери",
+				Year:   2009,
+			},
+			want:      []byte(protoShit1 + protoShit3),
+			testError: false,
+		},
+	}
+	for _, tC := range testCases {
+		t.Run(tC.desc, func(t *testing.T) {
+			got, err := MarshalPB(tC.input1)
 			if tC.testError {
 				if err == nil {
 					t.Errorf("missing error")

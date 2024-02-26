@@ -40,7 +40,30 @@ type Message interface {
 	GetAuthor() string
 }
 
-func MarshalProto(protoBook *protoc.BooksSlice) ([]byte, error) {
+func MarshalPB(protoBook *protoc.Book) ([]byte, error) {
+	var marshaled []byte
+	var err error
+	clonedBook := proto.Clone(protoBook).(*protoc.Book)
+	if protoBook.ProtoReflect().IsValid() { // комманда проверки валидности
+		marshaled, err = proto.Marshal(clonedBook)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return marshaled, nil
+}
+
+func UnmarshalPB(marshaled []byte) (*protoc.Book, error) {
+	protoBook := &protoc.Book{}
+	err := proto.Unmarshal(marshaled, protoBook)
+	if err != nil {
+		result := proto.Clone(protoBook).(*protoc.Book) // комманда копирования которая позволяет обойти лок структуры
+		return result, err
+	}
+	return protoBook, nil
+}
+
+func MarshalPBSlice(protoBook *protoc.BooksSlice) ([]byte, error) {
 	var marshaled []byte
 	var err error
 	clonedBook := proto.Clone(protoBook).(*protoc.BooksSlice)
@@ -53,7 +76,7 @@ func MarshalProto(protoBook *protoc.BooksSlice) ([]byte, error) {
 	return marshaled, nil
 }
 
-func UnmarshalProto(marshaled []byte) (*protoc.BooksSlice, error) {
+func UnmarshalPBSlice(marshaled []byte) (*protoc.BooksSlice, error) {
 	protoBook := &protoc.BooksSlice{}
 	err := proto.Unmarshal(marshaled, protoBook)
 	if err != nil {
@@ -157,15 +180,14 @@ func main() {
 	}
 
 	protoBook := ToProtobufStructure(bookNew)
-
-	marshaled, errProto := MarshalProto(protoBook)
+	marshaled, errProto := MarshalPBSlice(protoBook)
 	if errProto != nil {
 		fmt.Println("error is:", errProto)
 	}
 
 	fmt.Printf("\n----\nMarshaled protoc message:%s\n-----\n", marshaled)
 
-	protoBookNew, errUnmarshalProto := UnmarshalProto(marshaled)
+	protoBookNew, errUnmarshalProto := UnmarshalPBSlice(marshaled)
 	if errUnmarshalProto != nil {
 		fmt.Println("error is:", errUnmarshalProto)
 	}
@@ -173,4 +195,16 @@ func main() {
 	for i := range protoBookNew.Books {
 		fmt.Println("	Unmarshled Protoc element of protoBookNew[", i, "]:", protoBookNew.Books[i])
 	}
+	tmp = "\n\x11978-5-389-21499-6\x12#Элегантность ежика\x1a\x1dМюриель Барбери \xd9\x0f(\x90\x035\x9a\x99\x19@"
+	protoBookOne, err := UnmarshalPB([]byte(tmp))
+	if err != nil {
+		fmt.Println("error is:", err)
+	}
+	fmt.Println("Unmarshled Protobuf element of protoBookOne:", protoBookOne)
+
+	result, err = MarshalPB(protoBookOne)
+	if err != nil {
+		fmt.Println("error is:", err)
+	}
+	fmt.Println("Marshaled protoc message:", string(result))
 }
