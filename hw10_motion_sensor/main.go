@@ -23,7 +23,6 @@ func collectStat(chanelStat chan<- uint64, loopCounter int) {
 		time.Sleep(time.Second)
 	}
 	close(chanelStat)
-	// fmt.Println("collectStat finished")
 }
 
 func aggregateStat(chanelStat <-chan uint64, ageregatedStat chan<- uint64) {
@@ -42,7 +41,6 @@ func aggregateStat(chanelStat <-chan uint64, ageregatedStat chan<- uint64) {
 			}
 		} else {
 			close(ageregatedStat)
-			// fmt.Println("aggregateStat finished")
 			break
 		}
 	}
@@ -54,7 +52,6 @@ func printStat(ageregatedStat <-chan uint64) {
 		if ok {
 			fmt.Println("AverageAllocMemory:", task, " Bytes")
 		} else {
-			// fmt.Println("printStat finished")
 			break
 		}
 	}
