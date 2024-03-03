@@ -87,12 +87,13 @@ func TestAggregateStat(t *testing.T) {
 			chanelStat := make(chan uint64)
 			ageregatedStat := make(chan uint64)
 			go aggregateStat(chanelStat, ageregatedStat)
-			testInput := func() {
+			go func() {
 				for _, v := range tC.input1 {
 					chanelStat <- v
 				}
-			}
-			testValidate := func() {
+				close(chanelStat)
+			}()
+			go func() {
 				for {
 					got, ok := <-ageregatedStat
 					if ok {
@@ -104,11 +105,8 @@ func TestAggregateStat(t *testing.T) {
 						break
 					}
 				}
-			}
-			go testInput()
-			go testValidate()
+			}()
 			time.Sleep(time.Second)
-			close(chanelStat)
 		})
 	}
 }
