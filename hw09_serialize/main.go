@@ -103,30 +103,30 @@ func ToProtobufStructure(bookSlice []*books.Book) *protoc.BooksSlice {
 	return result
 }
 
-func MarshalJSONSlice(ctr []*books.Book) ([]byte, error) {
-	var resultJSON []byte
-	if ctr != nil {
-		for i, element := range ctr {
-			if element != nil {
-				result, err := element.MarshalJSON()
-				switch {
-				case err != nil:
-					return nil, err
-				case i == 0:
-					resultJSON = result
+// func MarshalJSONSlice(ctr []*books.Book) ([]byte, error) {
+// 	var resultJSON []byte
+// 	if ctr != nil {
+// 		for i, element := range ctr {
+// 			if element != nil {
+// 				result, err := element.MarshalJSON()
+// 				switch {
+// 				case err != nil:
+// 					return nil, err
+// 				case i == 0:
+// 					resultJSON = result
 
-				default:
-					resultJSON = append(resultJSON, []byte(`,`)...)
-					resultJSON = append(resultJSON, result...)
-				}
-			}
-		}
-		resultJSON = append([]byte(`[`), resultJSON...)
-		resultJSON = append(resultJSON, []byte(`]`)...)
-		return resultJSON, nil
-	}
-	return nil, EmptySlice
-}
+// 				default:
+// 					resultJSON = append(resultJSON, []byte(`,`)...)
+// 					resultJSON = append(resultJSON, result...)
+// 				}
+// 			}
+// 		}
+// 		resultJSON = append([]byte(`[`), resultJSON...)
+// 		resultJSON = append(resultJSON, []byte(`]`)...)
+// 		return resultJSON, nil
+// 	}
+// 	return nil, EmptySlice
+// }
 
 func main() {
 	tmp := `{"id":"978","title":"Ку-Ка","author":"-Ре-Ку","year":2009,"size":400,"rate":2.4}`
@@ -142,7 +142,7 @@ func main() {
 	}
 	fmt.Println("Unmarshal one:", string(result))
 
-	bookSlice := make([]*books.Book, 5)
+	bookSlice := make([]*books.Book, 3)
 	bookSlice[0] = &books.Book{
 		ID:     "978",
 		Title:  "Мюриель ежик",
@@ -158,13 +158,14 @@ func main() {
 		Year:   2009,
 		Rate:   2.4,
 	}
-	bookSlice[4] = &books.Book{
+	bookSlice[2] = &books.Book{
 		ID:     "3232-re",
 		Title:  "tttt",
 		Author: "aaaa",
 		Rate:   3.6,
 	}
-	result, err = MarshalJSONSlice(bookSlice)
+
+	result, err = books.MarshalJSONSlice(bookSlice)
 	if err != nil {
 		fmt.Println("error is:", err)
 	}

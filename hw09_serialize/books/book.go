@@ -34,6 +34,11 @@ func UnmarshalJSONSlice(data []byte) ([]*Book, error) {
 	return ctr, nil
 }
 
+func MarshalJSONSlice(ctr []*Book) ([]byte, error) {
+	result, err := json.Marshal(ctr)
+	return result, err
+}
+
 func (ctr *Book) MarshalJSON() ([]byte, error) {
 	type dropDefaultInf Book
 	result, err := json.Marshal((*dropDefaultInf)(ctr))
