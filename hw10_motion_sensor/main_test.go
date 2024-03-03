@@ -2,7 +2,6 @@ package main
 
 import (
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -55,23 +54,31 @@ func TestAggregateStat(t *testing.T) {
 		want      uint64
 		desc      string
 		input1    []uint64
+		input2    int
 		testError bool
 	}{
 		{
 			desc:      "check gorutine - ok",
 			input1:    []uint64{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+			input2:    1,
 			want:      5,
 			testError: false,
 		},
 		{
 			desc:      "check gorutine - ok 2",
 			input1:    []uint64{12, 4, 3, 40, 5, 6, 1, 8, 0, 20},
+			input2:    1,
 			want:      9,
 			testError: false,
 		},
 		{
-			desc:      "check gorutine - big array",
-			input1:    []uint64{12, 4, 3, 40, 5, 6, 1, 8, 100, 20, 12, 4, 3, 40, 5, 6, 1, 8, 100, 20},
+			desc: "check gorutine - big array",
+			input1: []uint64{
+				12, 4, 3, 40, 5, 6, 1, 8, 100, 20,
+				12, 4, 3, 40, 5, 6, 1, 8, 100, 20,
+				12, 4, 3, 40, 5, 6, 1, 8, 100, 20,
+			},
+			input2:    3,
 			want:      19,
 			testError: false,
 		},
@@ -87,26 +94,24 @@ func TestAggregateStat(t *testing.T) {
 			chanelStat := make(chan uint64)
 			ageregatedStat := make(chan uint64)
 			go aggregateStat(chanelStat, ageregatedStat)
-			go func() {
-				for _, v := range tC.input1 {
+			for i := 0; i < tC.input2; i++ {
+				for i, v := range tC.input1 {
 					chanelStat <- v
-				}
-				close(chanelStat)
-			}()
-			go func() {
-				for {
-					got, ok := <-ageregatedStat
-					if ok {
-						assert.Equal(t, tC.want, got)
-					} else {
-						if tC.testError {
-							assert.Equal(t, ok, false)
-						}
+					if i >= 9 {
 						break
 					}
 				}
-			}()
-			time.Sleep(time.Second)
+				got, ok := <-ageregatedStat
+				if ok {
+					assert.Equal(t, tC.want, got)
+				} else {
+					if tC.testError {
+						assert.Equal(t, ok, false)
+					}
+					break
+				}
+			}
+			close(chanelStat)
 		})
 	}
 }
