@@ -165,6 +165,7 @@ func TestMarshalJSON(t *testing.T) {
 		})
 	}
 }
+
 func TestMarshalJSONSlice(t *testing.T) {
 	testCases := []struct {
 		want1     []byte
