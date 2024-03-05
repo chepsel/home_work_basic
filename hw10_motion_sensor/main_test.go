@@ -2,6 +2,7 @@ package main
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -30,7 +31,6 @@ func TestCollectStat(t *testing.T) {
 		t.Run(tC.desc, func(t *testing.T) {
 			chanelStat := make(chan uint64)
 			endSignal := make(chan bool, 1)
-			go stopper(tC.input1, endSignal)
 			go collectStat(chanelStat, endSignal)
 			if tC.testError {
 				for i := 0; i < tC.input1; i++ {
@@ -39,6 +39,7 @@ func TestCollectStat(t *testing.T) {
 						break
 					}
 				}
+				endSignal <- true
 				_, ok := <-chanelStat
 				assert.Equal(t, tC.want, ok)
 			} else {
@@ -121,6 +122,17 @@ func TestAggregateStat(t *testing.T) {
 func TestPrintMemUsage(t *testing.T) {
 	got := CryptoRand(9999999)
 	if got <= 0 {
+		t.Errorf("error")
+	}
+}
+
+func TestStopper(t *testing.T) {
+	endSignal := make(chan bool, 1)
+	go stopper(2, endSignal)
+	select {
+	case <-endSignal:
+		return
+	case <-time.After(3 * time.Second):
 		t.Errorf("error")
 	}
 }
