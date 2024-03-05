@@ -8,8 +8,8 @@ import (
 )
 
 func main() {
-	chanelStat := make(chan uint64, 1)
-	ageregatedStat := make(chan uint64, 1)
+	chanelStat := make(chan uint64)
+	ageregatedStat := make(chan uint64)
 	go collectStat(chanelStat, 60)
 	go aggregateStat(chanelStat, ageregatedStat)
 	for task := range ageregatedStat {
