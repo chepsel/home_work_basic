@@ -29,7 +29,9 @@ func TestCollectStat(t *testing.T) {
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
 			chanelStat := make(chan uint64)
-			go collectStat(chanelStat, tC.input1)
+			endSignal := make(chan bool, 1)
+			go stopper(tC.input1, endSignal)
+			go collectStat(chanelStat, endSignal)
 			if tC.testError {
 				for i := 0; i < tC.input1; i++ {
 					_, ok := <-chanelStat
@@ -117,7 +119,7 @@ func TestAggregateStat(t *testing.T) {
 }
 
 func TestPrintMemUsage(t *testing.T) {
-	got := PrintMemUsage()
+	got := CryptoRand(9999999)
 	if got <= 0 {
 		t.Errorf("error")
 	}
