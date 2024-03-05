@@ -10,10 +10,8 @@ import (
 func main() {
 	chanelStat := make(chan uint64, 1)
 	ageregatedStat := make(chan uint64, 1)
-	endSignal := make(chan bool, 1)
-	go collectStat(chanelStat, endSignal)
+	go collectStat(chanelStat, 60)
 	go aggregateStat(chanelStat, ageregatedStat)
-	go stopper(60, endSignal)
 	for task := range ageregatedStat {
 		fmt.Println("AverageAllocMemory:", task, " Bytes")
 	}
@@ -27,19 +25,14 @@ func CryptoRand(limit int) uint64 {
 	return uint64(safeNum.Int64())
 }
 
-func stopper(seconds int, endSignal chan<- bool) {
-	time.Sleep(time.Duration(seconds) * time.Second)
-	endSignal <- true
-}
-
-func collectStat(chanelStat chan<- uint64, endSignal <-chan bool) {
+func collectStat(chanelStat chan<- uint64, seconds int) {
 	defer close(chanelStat)
-	chanelStat <- CryptoRand(9999999)
+	to := time.After(time.Duration(seconds) * time.Second)
 	for {
 		select {
-		case <-endSignal:
+		case <-to:
 			return
-		case <-time.After(time.Second):
+		default:
 			chanelStat <- CryptoRand(9999999)
 		}
 	}
