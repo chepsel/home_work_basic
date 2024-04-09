@@ -1,0 +1,3 @@
+log stat is:
+Event code[dfgfdgb] count match[1]
+Event code[234] count match[6]
