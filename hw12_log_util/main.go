@@ -21,7 +21,7 @@ const (
 
 const (
 	defaultOutput = "stdout"
-	defaultFile   = "default.log"
+	defaultFile   = "default"
 )
 
 func (e level) String() string {
@@ -96,6 +96,9 @@ func init() {
 }
 
 func main() {
+	if conf.logFile == defaultFile {
+		log.Fatal("flag file is mandatory, utillity stops")
+	}
 	result, err := ReadLog()
 	if err != nil {
 		log.Fatal("Some error:", err)

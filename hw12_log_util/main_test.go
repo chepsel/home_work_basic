@@ -68,7 +68,7 @@ func TestGetStrEnv(t *testing.T) {
 	}{
 		{
 			desc:  "check default file",
-			want:  "default.log",
+			want:  "default",
 			input: defaultFile,
 			env:   "LOG_ANALYZER_FILE",
 		},
