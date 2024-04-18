@@ -19,9 +19,10 @@ func (err SentinelError) Error() string {
 }
 
 const (
-	NotFound       SentinelError = "NotFound"
+	NotFound       SentinelError = "Not Found"
 	WrongParams    SentinelError = "Wrong request params"
 	WrongStructure SentinelError = "Wrong structure"
+	RequestError   SentinelError = "Request failed"
 )
 
 const (
@@ -91,6 +92,9 @@ func (ctr *Animal) Post() error {
 	defer resp.Body.Close()
 
 	log.Println(" POST - response status:", resp.Status)
+	if resp.StatusCode != http.StatusOK {
+		return RequestError
+	}
 	result, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
@@ -117,6 +121,9 @@ func (ctr *Animal) Get() error {
 	}
 	defer resp.Body.Close()
 	log.Println(" GET - response status:", resp.Status)
+	if resp.StatusCode != http.StatusOK {
+		return RequestError
+	}
 	result, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
