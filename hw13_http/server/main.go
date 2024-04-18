@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -27,22 +26,22 @@ type Config struct {
 	host string
 }
 
-var conf *Config = &Config{}
+var conf *Config
 
 func init() {
 	log.Println("- Start")
+	conf = &Config{}
 	flag.StringVar(&conf.port, "port", defaultPort, "listening port")
 	flag.StringVar(&conf.port, "p", conf.port, "listening port")
 	flag.StringVar(&conf.host, "host", defaultHost, "listening address")
 	flag.StringVar(&conf.host, "h", conf.host, "listening address")
-	log.Println(len(flag.Args()))
 	flag.Parse()
 	if conf.host == defaultHost || conf.port == defaultPort {
 		log.Fatalf("- wrong start params \n- port:\"%s\";\n- host:\"%s\";\n",
 			conf.port,
 			conf.host)
 	}
-	fmt.Printf("- port:\"%s\";\n- host:\"%s\";\n",
+	log.Printf("- port:\"%s\", host:\"%s\"\n",
 		conf.port,
 		conf.host)
 }
@@ -60,9 +59,9 @@ func main() {
 	mu := sync.Mutex{}
 	server := gin.Default()
 	v1 := server.Group("/v1")
-	carsApi := v1.Group("/restapi")
+	restAPI := v1.Group("/restapi")
 	{
-		carsApi.GET("/animal", func(c *gin.Context) {
+		restAPI.GET("/animal", func(c *gin.Context) {
 			id := c.Query("id")
 			if len(id) == 0 {
 				c.JSONP(http.StatusBadRequest, "Wrong request params")
@@ -73,36 +72,36 @@ func main() {
 				return
 			}
 			c.JSONP(http.StatusNotFound, "Not found")
-
 		})
-		carsApi.DELETE("/animal", func(c *gin.Context) {
+		restAPI.DELETE("/animal", func(c *gin.Context) {
 			id := c.Query("id")
 			if len(id) == 0 {
 				c.JSONP(http.StatusBadRequest, "Wrong request params")
 				return
 			}
 			if err := database.Delete(id, &mu); err != nil {
-				c.JSONP(http.StatusGone, gin.H{"err": source.MissingId})
+				c.JSONP(http.StatusGone, gin.H{"err": source.MissingID})
 			} else {
 				c.JSONP(200, "done")
 			}
 		})
-		carsApi.POST("/animal", func(c *gin.Context) {
+		restAPI.POST("/animal", func(c *gin.Context) {
 			var animal source.Animal
 			err := c.ShouldBindJSON(&animal)
 			if err != nil {
 				c.JSONP(http.StatusBadRequest, gin.H{"err": err.Error()})
 			}
-			if len(animal.Id) > 0 && len(animal.Name) > 0 {
-				database.Put(animal.Id, animal, &mu)
+			if len(animal.ID) > 0 && len(animal.Name) > 0 {
+				database.Put(animal.ID, animal, &mu)
+				c.JSONP(200, "success")
 			} else {
 				c.JSONP(http.StatusBadRequest, gin.H{"err": source.MissingKey})
 			}
 		})
 	}
-	var addres strings.Builder
-	addres.WriteString(conf.host)
-	addres.WriteString(":")
-	addres.WriteString(conf.port)
-	server.Run(addres.String())
+	var address strings.Builder
+	address.WriteString(conf.host)
+	address.WriteString(":")
+	address.WriteString(conf.port)
+	server.Run(address.String())
 }

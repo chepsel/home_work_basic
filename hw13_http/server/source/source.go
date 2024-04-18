@@ -17,13 +17,13 @@ func (err SentinelError) Error() string {
 const (
 	NotFound   SentinelError = "NotFound"
 	MissingKey SentinelError = "missing id or name key"
-	MissingId  SentinelError = "id is missing"
+	MissingID  SentinelError = "id is missing"
 )
 
 const storageFile = "../storage.json"
 
 type Animal struct {
-	Id     string `json:"id"`
+	ID     string `json:"id"`
 	Name   string `json:"name"`
 	Age    int8   `json:"age,omitempty"`
 	Weight int8   `json:"weight,omitempty"`
@@ -46,39 +46,39 @@ func FileDB() *Storage {
 	return &data
 }
 
-func (m *Storage) Get(id string) (Animal, error) {
+func (storage *Storage) Get(id string) (Animal, error) {
 	var empty Animal
-	if val := m.Animals[id]; val != empty {
-		return m.Animals[id], nil
+	if val := storage.Animals[id]; val != empty {
+		return storage.Animals[id], nil
 	}
 	return empty, NotFound
 }
 
-func (m *Storage) Put(id string, animals Animal, mu *sync.Mutex) {
+func (storage *Storage) Put(id string, animals Animal, mu *sync.Mutex) {
 	mu.Lock()
-	m.Animals[id] = animals
+	storage.Animals[id] = animals
 	mu.Unlock()
-	go SaveToStorage(m)
+	go SaveToStorage(storage)
 }
 
-func (m *Storage) Delete(id string, mu *sync.Mutex) error {
-	_, ok := m.Animals[id]
+func (storage *Storage) Delete(id string, mu *sync.Mutex) error {
+	_, ok := storage.Animals[id]
 	if !ok {
-		return MissingId
+		return MissingID
 	}
 	mu.Lock()
-	delete(m.Animals, id)
+	delete(storage.Animals, id)
 	mu.Unlock()
-	go SaveToStorage(m)
+	go SaveToStorage(storage)
 	return nil
 }
 
-func (m *Storage) SaveBeforeClose() error {
-	return SaveToStorage(m)
+func (storage *Storage) SaveBeforeClose() error {
+	return SaveToStorage(storage)
 }
 
-func SaveToStorage(input *Storage) error {
-	stored := input.formatToJSON()
+func SaveToStorage(storage *Storage) error {
+	stored := storage.formatToJSON()
 	byteArray, err := MarshalJSONSlice(stored)
 	if err != nil {
 		log.Printf("failed to encode structure: %v", err)
@@ -94,11 +94,11 @@ func SaveToStorage(input *Storage) error {
 	return nil
 }
 
-func (input *Storage) formatToJSON() []Animal {
-	arrayLengt := len(input.Animals)
+func (storage *Storage) formatToJSON() []Animal {
+	arrayLengt := len(storage.Animals)
 	animals := make([]Animal, arrayLengt)
 	var i int
-	for _, v := range input.Animals {
+	for _, v := range storage.Animals {
 		animals[i] = v
 		i++
 	}
@@ -106,12 +106,12 @@ func (input *Storage) formatToJSON() []Animal {
 	return animals
 }
 
-func (output *Storage) formatToMap(input []Animal) {
+func (storage *Storage) formatToMap(input []Animal) {
 	tmpMap := make(map[string]Animal)
 	for _, v := range input {
-		tmpMap[v.Id] = v
+		tmpMap[v.ID] = v
 	}
-	output.Animals = tmpMap
+	storage.Animals = tmpMap
 }
 
 func ReadStorage() (Storage, error) {
