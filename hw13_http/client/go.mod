@@ -1,6 +1,6 @@
 module github.com/chepsel/home_work_basic/hw13_http/clent
 
-go 1.21
+go 1.22
 
 require (
 	github.com/gin-gonic/gin v1.9.1
