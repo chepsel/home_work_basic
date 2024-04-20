@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/http"
 	"os"
 	"testing"
 
@@ -21,14 +22,27 @@ func fakeServer() {
 	restAPI := v1.Group("/restapi")
 	{
 		restAPI.GET("/animal", func(c *gin.Context) {
-			c.JSONP(200, nil)
+			id := c.Query("id")
+			if len(id) == 0 {
+				c.JSONP(http.StatusBadRequest, "Wrong request params")
+			} else {
+				c.JSONP(200, `{"id": "Vitaly","name": "Kapibara","age": 12,"weight": 33,"hight": 44}`)
+			}
 		})
 		restAPI.POST("/animal", func(c *gin.Context) {
-			c.JSONP(200, nil)
+			var animal Animal
+			err := c.ShouldBindJSON(&animal)
+			switch {
+			case err != nil:
+				c.JSONP(http.StatusBadRequest, gin.H{"err": err.Error()})
+			case len(animal.ID) > 0 && len(animal.Name) > 0:
+				c.JSONP(200, "success")
+			default:
+				c.JSONP(http.StatusBadRequest, gin.H{"err": "missing id or name key"})
+			}
 		})
 	}
 	server.Run(":8082")
-
 }
 
 func TestMarshalJSON(t *testing.T) {
@@ -117,8 +131,9 @@ func TestNewAnimal(t *testing.T) {
 
 func TestGet(t *testing.T) {
 	testCases := []struct {
-		desc   string
-		input1 *Animal
+		desc      string
+		input1    *Animal
+		errorTest bool
 	}{
 		{
 			desc:   "NewAnimal Check 1",
@@ -129,12 +144,19 @@ func TestGet(t *testing.T) {
 			desc:   "NewAnimal Check 2",
 			input1: NewAnimal("Bober", "Bober", 12, 33, 44),
 		},
+		{
+			desc:      "Error check",
+			input1:    &Animal{},
+			errorTest: true,
+		},
 	}
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
 			err := tC.input1.Get()
-			if err != nil {
+			if err != nil && tC.errorTest == false {
 				t.Errorf(err.Error())
+			} else if tC.errorTest && err == nil {
+				t.Errorf("lost error")
 			}
 		})
 	}
@@ -142,8 +164,9 @@ func TestGet(t *testing.T) {
 
 func TestPost(t *testing.T) {
 	testCases := []struct {
-		desc   string
-		input1 *Animal
+		desc      string
+		input1    *Animal
+		errorTest bool
 	}{
 		{
 			desc:   "NewAnimal Check 1",
@@ -154,12 +177,19 @@ func TestPost(t *testing.T) {
 			desc:   "NewAnimal Check 2",
 			input1: NewAnimal("Bober", "Bober", 12, 33, 44),
 		},
+		{
+			desc:      "Error check",
+			input1:    &Animal{},
+			errorTest: true,
+		},
 	}
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
 			err := tC.input1.Post()
-			if err != nil {
+			if err != nil && tC.errorTest == false {
 				t.Errorf(err.Error())
+			} else if tC.errorTest && err == nil {
+				t.Errorf("lost error")
 			}
 		})
 	}

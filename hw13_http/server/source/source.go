@@ -20,7 +20,7 @@ const (
 	MissingID  SentinelError = "id is missing"
 )
 
-const storageFile = "../storage.json"
+var storageFile = "./storage.json"
 
 type Animal struct {
 	ID     string `json:"id"`
