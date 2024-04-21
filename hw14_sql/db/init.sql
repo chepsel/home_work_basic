@@ -23,7 +23,8 @@ CREATE TABLE IF NOT EXISTS store.application.Products (
 );
 CREATE TABLE IF NOT exists store.application.OrderProducts (
   order_id INT REFERENCES application.Orders(id),
-  product_id INT REFERENCES application.Products(id)
+  product_id INT REFERENCES application.Products(id),
+  product_count NUMERIC(10, 2) NOT NULL
 );
 /*create indexes*/
 CREATE INDEX if not EXISTS orders_user_id_idx ON application.orders (user_id);

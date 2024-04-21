@@ -1,8 +1,7 @@
-package main
+package client
 
 import (
 	"net/http"
-	"os"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -11,7 +10,7 @@ import (
 
 var _ = func() bool {
 	testing.Init()
-	os.Args = append(os.Args, "-u=http://localhost:8082/v1/restapi/animal")
+	url = "http://localhost:8082/v1/restapi/animal"
 	go fakeServer()
 	return true
 }()

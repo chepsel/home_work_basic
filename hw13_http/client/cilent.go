@@ -1,10 +1,9 @@
-package main
+package client
 
 import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"flag"
 	"io"
 	"log"
 	"net/http"
@@ -23,29 +22,14 @@ const (
 	WrongParams    SentinelError = "Wrong request params"
 	WrongStructure SentinelError = "Wrong structure"
 	RequestError   SentinelError = "Request failed"
+	MissingFlag    SentinelError = "URL flag is missing"
 )
 
 const (
-	defaultURL string = "default"
+	DefaultURL string = "default"
 )
 
-type Config struct {
-	url string
-}
-
-var conf *Config
-
-func init() {
-	log.Println("- Start")
-	conf = &Config{}
-	flag.StringVar(&conf.url, "url", defaultURL, "request url")
-	flag.StringVar(&conf.url, "u", conf.url, "request url")
-	flag.Parse()
-	if conf.url == defaultURL {
-		log.Fatalf("- wrong start params \n- url:\"%s\";\n", conf.url)
-	}
-	log.Printf(" Base - url:\"%s\";\n", conf.url)
-}
+var url string
 
 type Animal struct {
 	ID     string `json:"id"`
@@ -79,7 +63,7 @@ func (ctr *Animal) Post() error {
 	log.Println(" POST - Resuest string:", string(body))
 	ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Millisecond)
 	defer cancel()
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, conf.url, bytes.NewBuffer(body))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(body))
 	if err != nil {
 		return WrongParams
 	}
@@ -105,7 +89,7 @@ func (ctr *Animal) Post() error {
 
 func (ctr *Animal) Get() error {
 	var address strings.Builder
-	address.WriteString(conf.url)
+	address.WriteString(url)
 	address.WriteString("?id=")
 	address.WriteString(ctr.ID)
 	log.Println(" GET - Request string:", address.String())
@@ -132,9 +116,21 @@ func (ctr *Animal) Get() error {
 	return nil
 }
 
-func main() {
+func Client(input string) error {
+	if input == DefaultURL {
+		log.Printf("- wrong start params \n- url:\"%s\";\n", input)
+		return MissingFlag
+	}
+	url = input
 	data := NewAnimal("Vitaly", "Kapibara", 12, 33, 44)
-	data.Post()
+	err := data.Post()
+	if err != nil {
+		return err
+	}
 	data.Get()
+	if err != nil {
+		return err
+	}
 	log.Println("- End")
+	return nil
 }
