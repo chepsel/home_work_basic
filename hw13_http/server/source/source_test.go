@@ -112,6 +112,10 @@ func TestDelete(t *testing.T) {
 	}
 }
 
+func TestFigureAreaCheckInf(t *testing.T) {
+	time.Sleep(100 * time.Millisecond)
+}
+
 func TestGetNotFound(t *testing.T) {
 	testCases := []struct {
 		input1 Animal
