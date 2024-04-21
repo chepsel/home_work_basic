@@ -1,7 +1,6 @@
-package main
+package server
 
 import (
-	"flag"
 	"log"
 	"net/http"
 	"os"
@@ -17,36 +16,16 @@ import (
 var database *source.Storage
 
 const (
-	defaultPort string = "default"
-	defaultHost string = "default"
+	DefaultHost string = "default"
+	DefaultPort string = "default"
 )
 
-type Config struct {
-	port string
-	host string
-}
-
-var conf *Config
-
-func init() {
-	log.Println("- Start")
-	conf = &Config{}
-	flag.StringVar(&conf.port, "port", defaultPort, "listening port")
-	flag.StringVar(&conf.port, "p", conf.port, "listening port")
-	flag.StringVar(&conf.host, "host", defaultHost, "listening address")
-	flag.StringVar(&conf.host, "h", conf.host, "listening address")
-	flag.Parse()
-	if conf.host == defaultHost || conf.port == defaultPort {
+func Server(host string, port string) {
+	if host == DefaultHost || port == DefaultPort {
 		log.Fatalf("- wrong start params \n- port:\"%s\";\n- host:\"%s\";\n",
-			conf.port,
-			conf.host)
+			port,
+			host)
 	}
-	log.Printf("- port:\"%s\", host:\"%s\"\n",
-		conf.port,
-		conf.host)
-}
-
-func main() {
 	database = source.FileDB()
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT)
@@ -100,8 +79,8 @@ func main() {
 		})
 	}
 	var address strings.Builder
-	address.WriteString(conf.host)
+	address.WriteString(host)
 	address.WriteString(":")
-	address.WriteString(conf.port)
+	address.WriteString(port)
 	server.Run(address.String())
 }
