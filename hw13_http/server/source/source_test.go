@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const testFile = "./storage.json"
+const testFile = "./storage_test.json"
 
 func TestPut(t *testing.T) {
 	testCases := []struct {
