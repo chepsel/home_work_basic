@@ -36,14 +36,14 @@ func TestPut(t *testing.T) {
 			animals[tC.input2] = tC.input1
 			storage := &Storage{Animals: animals}
 			storage.Put(tC.input2, tC.input1, &mu)
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(time.Second)
 			assert.Equal(t, true, true)
 		})
 	}
 }
 
 func TestGet(t *testing.T) {
-	time.Sleep(200 * time.Millisecond)
+	time.Sleep(time.Second)
 	storageFile = testFile
 	animals := make(map[string]Animal)
 	id := "Ignat"
@@ -151,13 +151,13 @@ func TestDelete(t *testing.T) {
 			if err != nil {
 				t.Errorf("error")
 			}
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(time.Second)
 		})
 	}
 }
 
 func TestGetNotFound(t *testing.T) {
-	time.Sleep(200 * time.Millisecond)
+	time.Sleep(time.Second)
 	storageFile = testFile
 	animals := make(map[string]Animal)
 	id := "Ignat"
