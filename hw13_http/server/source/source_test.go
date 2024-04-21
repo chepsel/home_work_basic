@@ -35,8 +35,10 @@ func TestPut(t *testing.T) {
 			animals := make(map[string]Animal)
 			animals[tC.input2] = tC.input1
 			storage := &Storage{Animals: animals}
-			storage.Put(tC.input2, tC.input1, &mu)
-			assert.Equal(t, true, true)
+			err := storage.Put(tC.input2, tC.input1, &mu)
+			if err != nil {
+				t.Errorf("error")
+			}
 			time.Sleep(500 * time.Millisecond)
 		})
 	}
