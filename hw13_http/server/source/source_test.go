@@ -48,7 +48,7 @@ func TestGet(t *testing.T) {
 		want   Animal
 	}{
 		{
-			desc: "check valid",
+			desc: "check 404",
 			input1: Animal{
 				ID:     "Ignat",
 				Name:   "Выхухоль",
@@ -108,6 +108,46 @@ func TestDelete(t *testing.T) {
 				t.Errorf("error")
 			}
 			time.Sleep(100 * time.Millisecond)
+		})
+	}
+}
+
+func TestGetNotFound(t *testing.T) {
+	testCases := []struct {
+		input1 Animal
+		input2 string
+		desc   string
+		want   Animal
+	}{
+		{
+			desc: "check valid",
+			input1: Animal{
+				ID:     "Ignat",
+				Name:   "Выхухоль",
+				Age:    12,
+				Weight: 21,
+				Hight:  30,
+			},
+			input2: "Ignat",
+			want: Animal{
+				ID:     "Ignat",
+				Name:   "Выхухоль",
+				Age:    12,
+				Weight: 21,
+				Hight:  30,
+			},
+		},
+	}
+	for _, tC := range testCases {
+		t.Run(tC.desc, func(t *testing.T) {
+			storageFile = testFile
+			animals := make(map[string]Animal)
+			animals[tC.input2] = tC.input1
+			storage := &Storage{Animals: animals}
+			_, err := storage.Get(tC.input2)
+			if err != nil {
+				t.Errorf("error")
+			}
 		})
 	}
 }
