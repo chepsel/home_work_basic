@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"log"
 	"net/http"
 	"os"
@@ -58,9 +59,13 @@ func Server(host string, port string) {
 				c.JSONP(http.StatusBadRequest, "Wrong request params")
 				return
 			}
-			if err := database.Delete(id, &mu); err != nil {
-				c.JSONP(http.StatusGone, gin.H{"err": source.MissingID})
-			} else {
+			err := database.Delete(id, &mu)
+			switch {
+			case errors.Is(err, source.MissingID):
+				c.JSONP(http.StatusGone, gin.H{"err": err})
+			case err != nil:
+				c.JSONP(http.StatusServiceUnavailable, gin.H{"err": err})
+			default:
 				c.JSONP(200, "done")
 			}
 		})
@@ -71,7 +76,10 @@ func Server(host string, port string) {
 				c.JSONP(http.StatusBadRequest, gin.H{"err": err.Error()})
 			}
 			if len(animal.ID) > 0 && len(animal.Name) > 0 {
-				database.Put(animal.ID, animal, &mu)
+				putErr := database.Put(animal.ID, animal, &mu)
+				if putErr != nil {
+					c.JSONP(http.StatusServiceUnavailable, gin.H{"err": err})
+				}
 				c.JSONP(200, "success")
 			} else {
 				c.JSONP(http.StatusBadRequest, gin.H{"err": source.MissingKey})

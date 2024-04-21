@@ -54,11 +54,15 @@ func (storage *Storage) Get(id string) (Animal, error) {
 	return empty, NotFound
 }
 
-func (storage *Storage) Put(id string, animals Animal, mu *sync.Mutex) {
+func (storage *Storage) Put(id string, animals Animal, mu *sync.Mutex) error {
 	mu.Lock()
 	storage.Animals[id] = animals
 	mu.Unlock()
-	go SaveToStorage(storage)
+	err := SaveToStorage(storage)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (storage *Storage) Delete(id string, mu *sync.Mutex) error {
@@ -69,7 +73,10 @@ func (storage *Storage) Delete(id string, mu *sync.Mutex) error {
 	mu.Lock()
 	delete(storage.Animals, id)
 	mu.Unlock()
-	go SaveToStorage(storage)
+	err := SaveToStorage(storage)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
