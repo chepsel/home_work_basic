@@ -139,7 +139,6 @@ func TestDelete(t *testing.T) {
 			if err != nil {
 				t.Errorf("error")
 			}
-			storage.Put(tC.input2, tC.input1, &mu)
 			time.Sleep(time.Second)
 		})
 	}
@@ -171,6 +170,7 @@ func TestPut(t *testing.T) {
 			animals[tC.input2] = tC.input1
 			storage := &Storage{Animals: animals}
 			storage.Put(tC.input2, tC.input1, &mu)
+			time.Sleep(time.Second)
 		})
 	}
 }

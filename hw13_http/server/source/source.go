@@ -102,7 +102,6 @@ func (storage *Storage) formatToJSON() []Animal {
 		animals[i] = v
 		i++
 	}
-
 	return animals
 }
 
