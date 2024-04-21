@@ -36,14 +36,45 @@ func TestPut(t *testing.T) {
 			animals[tC.input2] = tC.input1
 			storage := &Storage{Animals: animals}
 			storage.Put(tC.input2, tC.input1, &mu)
-			time.Sleep(time.Second)
 			assert.Equal(t, true, true)
+			time.Sleep(500 * time.Millisecond)
+		})
+	}
+}
+
+func TestSaveBeforeClose(t *testing.T) {
+	testCases := []struct {
+		input1 Animal
+		input2 string
+		desc   string
+	}{
+		{
+			desc: "check valid",
+			input1: Animal{
+				ID:     "Ignat",
+				Name:   "Выхухоль",
+				Age:    12,
+				Weight: 21,
+				Hight:  30,
+			},
+			input2: "Ignat",
+		},
+	}
+	for _, tC := range testCases {
+		t.Run(tC.desc, func(t *testing.T) {
+			storageFile = testFile
+			animals := make(map[string]Animal)
+			animals[tC.input2] = tC.input1
+			storage := &Storage{Animals: animals}
+			err := storage.SaveBeforeClose()
+			if err != nil {
+				t.Errorf("error")
+			}
 		})
 	}
 }
 
 func TestGet(t *testing.T) {
-	time.Sleep(time.Second)
 	storageFile = testFile
 	animals := make(map[string]Animal)
 	id := "Ignat"
@@ -90,38 +121,6 @@ func TestFileDB(t *testing.T) {
 	}
 }
 
-func TestSaveBeforeClose(t *testing.T) {
-	testCases := []struct {
-		input1 Animal
-		input2 string
-		desc   string
-	}{
-		{
-			desc: "check valid",
-			input1: Animal{
-				ID:     "Ignat",
-				Name:   "Выхухоль",
-				Age:    12,
-				Weight: 21,
-				Hight:  30,
-			},
-			input2: "Ignat",
-		},
-	}
-	for _, tC := range testCases {
-		t.Run(tC.desc, func(t *testing.T) {
-			storageFile = testFile
-			animals := make(map[string]Animal)
-			animals[tC.input2] = tC.input1
-			storage := &Storage{Animals: animals}
-			err := storage.SaveBeforeClose()
-			if err != nil {
-				t.Errorf("error")
-			}
-		})
-	}
-}
-
 func TestDelete(t *testing.T) {
 	testCases := []struct {
 		input1 Animal
@@ -151,16 +150,47 @@ func TestDelete(t *testing.T) {
 			if err != nil {
 				t.Errorf("error")
 			}
-			time.Sleep(time.Second)
+			time.Sleep(500 * time.Millisecond)
+		})
+	}
+}
+
+func TestSaveBeforeClose2(t *testing.T) {
+	testCases := []struct {
+		input1 Animal
+		input2 string
+		desc   string
+	}{
+		{
+			desc: "check valid",
+			input1: Animal{
+				ID:     "Ignat2",
+				Name:   "Выхухоль2",
+				Age:    45,
+				Weight: 33,
+				Hight:  55,
+			},
+			input2: "Ignat",
+		},
+	}
+	for _, tC := range testCases {
+		t.Run(tC.desc, func(t *testing.T) {
+			storageFile = testFile
+			animals := make(map[string]Animal)
+			animals[tC.input2] = tC.input1
+			storage := &Storage{Animals: animals}
+			err := storage.SaveBeforeClose()
+			if err != nil {
+				t.Errorf("error")
+			}
 		})
 	}
 }
 
 func TestGetNotFound(t *testing.T) {
-	time.Sleep(time.Second)
 	storageFile = testFile
 	animals := make(map[string]Animal)
-	id := "Ignat"
+	id := "Ignat3"
 	animal := Animal{
 		ID:     "Ignat",
 		Name:   "Выхухоль",
