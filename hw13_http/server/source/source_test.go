@@ -10,6 +10,37 @@ import (
 
 const testFile = "./storage.json"
 
+func TestPut(t *testing.T) {
+	testCases := []struct {
+		input1 Animal
+		input2 string
+		desc   string
+	}{
+		{
+			desc: "check valid",
+			input1: Animal{
+				ID:     "Ignat",
+				Name:   "Выхухоль",
+				Age:    12,
+				Weight: 21,
+				Hight:  30,
+			},
+			input2: "Ignat",
+		},
+	}
+	for _, tC := range testCases {
+		t.Run(tC.desc, func(t *testing.T) {
+			mu := sync.Mutex{}
+			storageFile = testFile
+			animals := make(map[string]Animal)
+			animals[tC.input2] = tC.input1
+			storage := &Storage{Animals: animals}
+			storage.Put(tC.input2, tC.input1, &mu)
+			time.Sleep(100 * time.Millisecond)
+		})
+	}
+}
+
 func TestFileDB(t *testing.T) {
 	testCases := []struct {
 		input1 Animal
@@ -72,50 +103,12 @@ func TestGet(t *testing.T) {
 			animals := make(map[string]Animal)
 			animals[tC.input2] = tC.input1
 			storage := &Storage{Animals: animals}
+			time.Sleep(100 * time.Millisecond)
 			got, _ := storage.Get(tC.input2)
 			assert.Equal(t, tC.want, got)
 		})
 	}
 }
-
-func TestDelete(t *testing.T) {
-	testCases := []struct {
-		input1 Animal
-		input2 string
-		desc   string
-	}{
-		{
-			desc: "check valid",
-			input1: Animal{
-				ID:     "Ignat",
-				Name:   "Выхухоль",
-				Age:    12,
-				Weight: 21,
-				Hight:  30,
-			},
-			input2: "Ignat",
-		},
-	}
-	for _, tC := range testCases {
-		t.Run(tC.desc, func(t *testing.T) {
-			mu := sync.Mutex{}
-			storageFile = testFile
-			animals := make(map[string]Animal)
-			animals[tC.input2] = tC.input1
-			storage := &Storage{Animals: animals}
-			err := storage.Delete(tC.input2, &mu)
-			if err != nil {
-				t.Errorf("error")
-			}
-			time.Sleep(100 * time.Millisecond)
-		})
-	}
-}
-
-func TestFigureAreaCheckInf(t *testing.T) {
-	time.Sleep(100 * time.Millisecond)
-}
-
 func TestGetNotFound(t *testing.T) {
 	testCases := []struct {
 		input1 Animal
@@ -188,7 +181,7 @@ func TestSaveBeforeClose(t *testing.T) {
 	}
 }
 
-func TestPut(t *testing.T) {
+func TestDelete(t *testing.T) {
 	testCases := []struct {
 		input1 Animal
 		input2 string
@@ -214,7 +207,10 @@ func TestPut(t *testing.T) {
 			animals[tC.input2] = tC.input1
 			storage := &Storage{Animals: animals}
 			time.Sleep(100 * time.Millisecond)
-			storage.Put(tC.input2, tC.input1, &mu)
+			err := storage.Delete(tC.input2, &mu)
+			if err != nil {
+				t.Errorf("error")
+			}
 			time.Sleep(100 * time.Millisecond)
 		})
 	}
