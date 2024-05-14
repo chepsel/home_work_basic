@@ -46,7 +46,9 @@ func FileDB() *Storage {
 	return &data
 }
 
-func (storage *Storage) Get(id string) (Animal, error) {
+func (storage *Storage) Get(id string, mu *sync.Mutex) (Animal, error) {
+	mu.Lock()
+	defer mu.Unlock()
 	var empty Animal
 	if val := storage.Animals[id]; val != empty {
 		return storage.Animals[id], nil
@@ -154,4 +156,19 @@ func UnmarshalJSONSlice(data []byte) ([]Animal, error) {
 func MarshalJSONSlice(ctr []Animal) ([]byte, error) {
 	result, err := json.Marshal(ctr)
 	return result, err
+}
+
+func (ctr *Animal) MarshalJSON() ([]byte, error) {
+	type dropDefaultInf Animal
+	result, err := json.Marshal((*dropDefaultInf)(ctr))
+	return result, err
+}
+
+func (ctr *Animal) UnmarshalJSON(data []byte) error {
+	type dropDefaultInf Animal
+	err := json.Unmarshal(data, (*dropDefaultInf)(ctr))
+	if err != nil {
+		return err
+	}
+	return nil
 }

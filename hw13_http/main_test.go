@@ -1,12 +1,11 @@
 package main
 
 import (
-	"net/http"
 	"os"
 	"testing"
 
 	"github.com/chepsel/home_work_basic/hw13_http/client"
-	"github.com/gin-gonic/gin"
+	"github.com/chepsel/home_work_basic/hw13_http/server"
 )
 
 var _ = func() bool {
@@ -17,32 +16,7 @@ var _ = func() bool {
 }()
 
 func fakeServer() {
-	server := gin.Default()
-	v1 := server.Group("/v1")
-	restAPI := v1.Group("/restapi")
-	{
-		restAPI.GET("/animal", func(c *gin.Context) {
-			id := c.Query("id")
-			if len(id) == 0 {
-				c.JSONP(http.StatusBadRequest, "Wrong request params")
-			} else {
-				c.JSONP(200, `{"id": "Vitaly","name": "Kapibara","age": 12,"weight": 33,"hight": 44}`)
-			}
-		})
-		restAPI.POST("/animal", func(c *gin.Context) {
-			var animal client.Animal
-			err := c.ShouldBindJSON(&animal)
-			switch {
-			case err != nil:
-				c.JSONP(http.StatusBadRequest, gin.H{"err": err.Error()})
-			case len(animal.ID) > 0 && len(animal.Name) > 0:
-				c.JSONP(200, "success")
-			default:
-				c.JSONP(http.StatusBadRequest, gin.H{"err": "missing id or name key"})
-			}
-		})
-	}
-	server.Run(":8083")
+	server.Server("localhost", "8083")
 }
 
 func TestClient(t *testing.T) {
