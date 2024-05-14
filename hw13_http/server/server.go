@@ -139,11 +139,10 @@ func (database Animals) Route(resp http.ResponseWriter, req *http.Request) {
 			}
 			resp.Write([]byte("success"))
 			return
-		} else {
-			resultCode = http.StatusBadRequest
-			http.Error(resp, source.MissingKey.Error(), resultCode)
-			return
 		}
+		resultCode = http.StatusBadRequest
+		http.Error(resp, source.MissingKey.Error(), resultCode)
+		return
 	default:
 		resultCode = http.StatusMethodNotAllowed
 		http.Error(resp, "Method not used", resultCode)
