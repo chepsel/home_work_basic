@@ -77,6 +77,7 @@ func TestSaveBeforeClose(t *testing.T) {
 }
 
 func TestGet(t *testing.T) {
+	mu := sync.Mutex{}
 	storageFile = testFile
 	animals := make(map[string]Animal)
 	id := "Ignat"
@@ -89,7 +90,7 @@ func TestGet(t *testing.T) {
 	}
 	animals[id] = animal
 	storage := &Storage{Animals: animals}
-	got, _ := storage.Get("Ignat")
+	got, _ := storage.Get("Ignat", &mu)
 	assert.Equal(t, animal, got)
 }
 
@@ -190,6 +191,7 @@ func TestSaveBeforeClose2(t *testing.T) {
 }
 
 func TestGetNotFound(t *testing.T) {
+	mu := sync.Mutex{}
 	storageFile = testFile
 	animals := make(map[string]Animal)
 	id := "Ignat3"
@@ -202,7 +204,7 @@ func TestGetNotFound(t *testing.T) {
 	}
 	animals[id] = animal
 	storage := &Storage{Animals: animals}
-	_, err := storage.Get(id)
+	_, err := storage.Get(id, &mu)
 	if err != nil {
 		t.Errorf("error")
 	}
