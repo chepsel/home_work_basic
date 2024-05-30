@@ -1,6 +1,6 @@
 module github.com/chepsel/home_work_basic/hw15_go_sql
 
-go 1.21
+go 1.22.1
 
 require (
 	github.com/fatih/color v1.17.0
