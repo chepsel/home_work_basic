@@ -1,0 +1,25 @@
+version: "1"
+services:
+    db:
+        image: postgres:16-alpine
+        container_name: storedb
+        ports:
+            - 5432:5432
+        environment:
+            POSTGRES_USER: "admin"
+            POSTGRES_PASSWORD: "12345678"
+            PGDATA: "/var/lib/postgresql/data/pgdata"
+        volumes:
+            - ./database/init:/docker-entrypoint-initdb.d
+            - ./database/files:/var/lib/postgresql/data
+    app:
+        build: 
+            context: ../
+            dockerfile: ./hw16_docker/Dockerfile
+        container_name: store
+        volumes:
+            - ./server/:/app/config/
+        ports:
+            - 8000:8080
+        links:
+            - db

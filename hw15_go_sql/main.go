@@ -14,7 +14,6 @@ import (
 	logger "github.com/chepsel/home_work_basic/hw15_go_sql/internal/logger"
 	restapi "github.com/chepsel/home_work_basic/hw15_go_sql/internal/restapi"
 	source "github.com/chepsel/home_work_basic/hw15_go_sql/internal/source"
-	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
 
@@ -25,8 +24,7 @@ func main() {
 	dsn := cfg.ConnectionString()
 
 	database.Logger = logger.New(cfg.LogLevel())
-	database.DB, err = sqlx.Connect("postgres", dsn)
-	if err != nil {
+	if err = database.Connect("postgres", dsn); err != nil {
 		database.LogError("connect", err)
 		os.Exit(2)
 	}
