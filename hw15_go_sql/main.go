@@ -30,6 +30,11 @@ func main() {
 		database.LogError("connect", err)
 		os.Exit(2)
 	}
+	if err = database.PingDS(); err != nil {
+		database.LogError("ping", err)
+		os.Exit(1)
+	}
+
 	defer database.DB.Close()
 
 	database.DB.SetMaxOpenConns(cfg.Database.ConnPull)
