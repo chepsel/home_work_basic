@@ -1,0 +1,14 @@
+server:
+  host: "localhost"
+  port: 8000
+  idleTimeout: 60
+  rwTimout: 10
+database:
+  user: "application"
+  password: "application123"
+  dbname: "store"
+  host: "localhost"
+  port: 5402
+  connectionPull: 8
+log:
+  level: "debug"
