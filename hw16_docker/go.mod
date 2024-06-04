@@ -1,3 +1,3 @@
-module github.com/fixme_my_friend/hw16_docker
+module github.com/chepsel/home_work_basic/hw16_docker
 
-go 1.20
+go 1.22.1

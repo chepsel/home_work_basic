@@ -41,3 +41,20 @@ func (src *Database) PingDS() error {
 	go src.LogDBResult(queryType, "database is up")
 	return nil
 }
+
+func (src *Database) Connect(db string, dsn string) (err error) {
+	var i int8
+	queryType := "Connection to DB"
+	src.DB, err = sqlx.Connect("postgres", dsn)
+	if err != nil {
+		for i < 10 && err != nil {
+			src.LogError(queryType, err)
+			time.Sleep(5 * time.Second)
+			src.DB, err = sqlx.Connect("postgres", dsn)
+			i++
+		}
+		return err
+	}
+	go src.LogDBResult(queryType, "connection is ok")
+	return nil
+}

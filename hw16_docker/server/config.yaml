@@ -1,0 +1,14 @@
+server:
+  host: "store"
+  port: 8080
+  idleTimeout: 60
+  rwTimout: 10
+database:
+  user: "application"
+  password: "application123"
+  dbname: "store"
+  host: "storedb"
+  port: 5432
+  connectionPull: 8
+log:
+  level: "debug"
